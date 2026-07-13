@@ -1,0 +1,134 @@
+Inventory Name (inventory_nm),Description (inventory_desc),Condition (inventory_condition),Serial Number (serial_number),Category (category_nm),Itemkind (itemkind_nm),Office Name (office_nm)
+Tachometer,,functional,N1036611-2,Machine and Power Engineering,Tachometer,DABE
+Tachometer,,functional,N1036611-3,Machine and Power Engineering,Tachometer,DABE
+Solar Meter,,functional,CEGS-22-76,Machine and Power Engineering,Solar Meter,DABE
+Digital anemometer,,functional,"IGF-164-20-09-166,",Machine and Power Engineering,Digital anemometer,DABE
+Pitot Tube Anemometer and Differential Manometer,,functional,"CREATE-0053,",Machine and Power Engineering,Pitot Tube Anemometer and Differential Manometer,CReATe
+Digital Hot Wire Anemometer Kit,,functional,"A.058332, CREATE-0009",Machine and Power Engineering,Digital Hot Wire Anemometer Kit,CReATe
+Bomb Calorimeter,,functional,CEGS-21-15,Machine and Power Engineering,Bomb Calorimeter,DABE
+Graduated Cylinder 500ml,500 ml,functional,NA - 1,Machine and Power Engineering,Cylinder,CReATe
+Graduated Cylinder 500ml,500 ml,functional,NA - 2,Machine and Power Engineering,Cylinder,CReATe
+Graduated Cylinder 500ml,500 ml,functional,NA - 3,Machine and Power Engineering,Cylinder,CReATe
+Graduated Cylinder 500ml,500 ml,functional,NA - 4,Machine and Power Engineering,Cylinder,CReATe
+Graduated Cylinder 500ml,500 ml,functional,NA - 5,Machine and Power Engineering,Cylinder,CReATe
+Graduated Cylinder 500ml,500 ml,functional,NA - 6,Machine and Power Engineering,Cylinder,CReATe
+Graduated Cylinder 250ml,250 ml,functional,NA - 7,Machine and Power Engineering,Cylinder,CReATe
+Digital Balance,,functional,CREATE-0068,Machine and Power Engineering,Digital Balance,CReATe
+Digital Balance,,functional,CREATE-0072 ,Machine and Power Engineering,Digital Balance,CReATe
+Analytical Balance,,functional,a3142711912,Machine and Power Engineering,Analytical Balance,CReATe
+Top Loading Balance,,functional,D465531824,Machine and Power Engineering,Top Loading Balance,CReATe
+Photo Digital Tachometer,,functional,187501,Machine and Power Engineering,Tachometer,CReATe
+Contact Digital Tachometer,,functional,GLRG NEDA 1604,Machine and Power Engineering,Tachometer,DABE
+Photo Digital Tachometer,,functional,MBGIC25015,Machine and Power Engineering,Tachometer,CReATe
+Digital Sound Level Meter,,functional,CEGS-22-73,Machine and Power Engineering,Sound Level Meter,CReATe
+Digital Sound Level Meter,,functional,241202722,Machine and Power Engineering,Sound Level Meter,CReATe
+Digital Sound Level Meter,,functional,241202799,Machine and Power Engineering,Sound Level Meter,CReATe
+Digital Sound Level Meter,,functional,CEGS-19-33,Machine and Power Engineering,Sound Level Meter,DABE
+DSLR Camera,,functional,CREATE-OO14,Structures and Environment Engineering,Camera,CReATe
+Projector,,functional,MRJPV1100X9390050BJ900,Structures and Environment Engineering,Projector,DABE
+Projector,,functional,MRJTG11007410011C95920,Structures and Environment Engineering,Projector,DABE
+Multimeter Tester,,functional,CREATE-0005,Structures and Environment Engineering,Multimeter Tester,CReATe
+Clamp-on Ammeter,,functional,CEGS-22-120,Structures and Environment Engineering,Clamp-on ammeter,DABE
+Clamp-on Ammeter,,functional,CEGS-22-121,Structures and Environment Engineering,Clamp-on ammeter,DABE
+kWh meter,,functional,CREATE-0040,Structures and Environment Engineering,kWh meter,CReATe
+Multi-Parameter Water Tester(pH Meter),,functional,CEGS-22-74,Structures and Environment Engineering,Ph meter,DABE
+Multi-Parameter Water Tester(pH Meter),,functional,CEGS-22-75,Structures and Environment Engineering,Ph meter,DABE
+Handheld Colorimeter,,functional,10002000803,Structures and Environment Engineering,Colorimeter (Digital),CReATe
+Handheld Colorimeter,,functional,172000117,Structures and Environment Engineering,Colorimeter (Digital),CReATe
+Velocity/Flow meter,,functional,NA - 8,Soil and Water Conservation Engineering,Flow meter,CReATe
+Current Velocity Meter,,functional,180000609,Soil and Water Conservation Engineering,Velocity meter,CReATe
+Rain gauge,,functional,NA - 9,Soil and Water Conservation Engineering,Rain Gauge,DABE
+Soil Moisture Meter,,functional,CREATE-OOO7,Soil and Water Conservation Engineering,Soil Moisture meter,CReATe
+Recording rain gauge,,functional,NA - 10,Soil and Water Conservation Engineering,Rain Gauge,CReATe
+Soil Ph Meter,,functional,IGF-164-18-12-476,Soil and Water Conservation Engineering,Soil Ph Meter,CReATe
+Pressure and Flow Meter,,functional,NA - 11 ,Soil and Water Conservation Engineering,Flow meter,DABE
+Pond aerators,,functional,CEGS-22-119,Soil and Water Conservation Engineering,Pond Aerators,DABE
+Surveying Instrument,,functional,NA - 12,Soil and Water Conservation Engineering,Surveying instruments,CReATe
+Grain Moisture Analyzer,,functional,BJ33240,Soil and Water Conservation Engineering,Grain Moisture meter,CReATe
+Digital Weighing Scale,,functional,CEIT-18-973,Soil and Water Conservation Engineering,Digital weighing scale,DABE
+Sieves,size 12,functional,NA - 13,Soil and Water Conservation Engineering,Sieves,CReATe
+Sieves,size 40,functional,NA - 14,Soil and Water Conservation Engineering,Sieves,CReATe
+Sieves,size 60,functional,NA - 15,Soil and Water Conservation Engineering,Sieves,CReATe
+Sieves,size 120,functional,NA - 16,Soil and Water Conservation Engineering,Sieves,CReATe
+Sieves,size 200,functional,NA - 17,Soil and Water Conservation Engineering,Sieves,CReATe
+Sieves,size 230,functional,NA - 18,Soil and Water Conservation Engineering,Sieves,CReATe
+Sieves,size 140,functional,NA - 19,Soil and Water Conservation Engineering,Sieves,CReATe
+Sieves,base,functional,NA - 20,Soil and Water Conservation Engineering,Sieves,CReATe
+Sieves,cover,functional,NA - 21,Soil and Water Conservation Engineering,Sieves,CReATe
+Digital Vernier Calipers,,functional,CEGS-19-56,Agricultural food and Bioprocess Engineering ,Digital Vernier Calipers,CReATe
+Near-infrared thermometer,,functional,CEGS-22-34,Agricultural food and Bioprocess Engineering ,Near-infared thermometer,DABE
+Thermocouple,,functional,CREATE-0032,Agricultural food and Bioprocess Engineering ,Thermocouple,CReATe
+Digital Thermocouple with data logger,,functional,NA - 22,Agricultural food and Bioprocess Engineering ,Thermocouple,CReATe
+Sieves,size 6,functional,NA - 23,Agricultural food and Bioprocess Engineering ,Sieves,CReATe
+Sieves,size 8,functional,NA - 24,Agricultural food and Bioprocess Engineering ,Sieves,CReATe
+Sieves,size 10,functional,NA - 25,Agricultural food and Bioprocess Engineering ,Sieves,CReATe
+Sieves,size 12,functional,NA - 26,Agricultural food and Bioprocess Engineering ,Sieves,CReATe
+Sieves,size 14,functional,NA - 27,Agricultural food and Bioprocess Engineering ,Sieves,CReATe
+Sieves,size 16,functional,NA - 28,Agricultural food and Bioprocess Engineering ,Sieves,CReATe
+Sieves,size 18,functional,NA - 29,Agricultural food and Bioprocess Engineering ,Sieves,CReATe
+Sieves,size 20,functional,NA - 30,Agricultural food and Bioprocess Engineering ,Sieves,CReATe
+Sieves,size 25,functional,NA - 31,Agricultural food and Bioprocess Engineering ,Sieves,CReATe
+Sling Psychrometers,,functional,CEGS LAB-23-6,Agricultural food and Bioprocess Engineering ,Sling Psycometers,DABE
+Food Moisture Meter,,functional,CREATE-0050,Agricultural food and Bioprocess Engineering ,Food moisture meter,CReATe
+Digital Temperature Monitor,,functional,CREATE-0002,Agricultural food and Bioprocess Engineering ,Temperature Monitor,CReATe
+Viscometer (Digital Rotational),,functional,RS RAMDA.4 0T-22-281,Agricultural food and Bioprocess Engineering ,Viscometer,CReATe
+Digital Humidity Meter/Hygrometer,,functional,CEGS-19-41,Agricultural food and Bioprocess Engineering ,Hygrometer,CReATe
+Dessicator,,functional,CEGS-22-72,Agricultural food and Bioprocess Engineering ,Dessicator,DABE
+Dessicator,,functional,CEGS-22-71,Agricultural food and Bioprocess Engineering ,Dessicator,DABE
+Dessicator,,functional,RAF-101-22-06-251,Agricultural food and Bioprocess Engineering ,Dessicator,DABE
+vortex mixer,,functional,MI0101002,Others,Vortex Mixers,CReATe
+Hologen light source,,Functional,,Others,Hologen light source,CReATe
+refractometer,,Functional,CREATE-0065A,Others,refractometer,CReATe
+penetrometer,,Functional,1.47374,Others,penetrometer,CReATe
+smart TV,,Functional,DOST-GIA-1793,Others,smart TV,CReATe
+Printer,,Functional,EPSON L360,Others,Printer,CReATe
+Printer,,Functional,Brother DCP-720DW,Others,Printer,CReATe
+Drill bits,,Functional,NA - 32,Others,Drill bits,CReATe
+PaperlessRecorder,,Functional,20220706008,Others,PaperlessRecorder,CReATe
+Portable Amplifyer,,Functional,202,Others,Portable Amplifyer,CReATe
+Spectrometer,,Functional,CREATE-0022,Others,Spectrometer,CReATe
+Tribrach & Adapter with OP,,Functional,CREATE-0012,Others,Tribrach & Adapter with OP,CReATe
+Handheld GPS,,Functional,1065269,Others,Handheld GPS,CReATe
+Handheld GPS,,Functional,10653857,Others,Handheld GPS,CReATe
+Handheld GPS,,Functional,106552604,Others,Handheld GPS,CReATe
+Handheld GPS,,Functional,10653871,Others,Handheld GPS,CReATe
+AGA Power,,Functional,CREATE-0021-A,Others,AGA Power,CReATe
+AGA Power,,Functional,CREATE-0021-B,Others,AGA Power,CReATe
+Professional Laser Range Finder,,Functional,CREATE-0016-A,Others,Professional Laser Range Finder,CReATe
+Laser Distance Meter,,Functional,CREATE-0019,Others,Laser Distance Meter,CReATe
+Go-Pro,,Functional,CREATE-0023,Others,Go-Pro,CReATe
+Canon Cam,,functional,CREATE-0018,Others,Canon Cam,CReATe
+Fuji U-cam,,Functional,CREATE-0017,Others,Fuji U-cam,CReATe
+Water Flow Logger,,Functional,22H108155,Others,Water Flow Logger,CReATe
+Portable Power Drill Makita,,Functional,NA - 33,Others,Portable Power Drill Makita,CReATe
+Helmets White,,Functional,NA - 34,Others,Helmets White,CReATe
+Helmets White,,Functional,NA - 35,Others,Helmets White,CReATe
+Helmets White,,Functional,NA - 36,Others,Helmets White,CReATe
+Helmets White,,Functional,NA - 37,Others,Helmets White,CReATe
+Helmets White,,Functional,NA - 38,Others,Helmets White,CReATe
+Helmets White,,Functional,NA - 39,Others,Helmets White,CReATe
+Helmets White,,Functional,NA - 40,Others,Helmets White,CReATe
+Helmets White,,Functional,NA - 41,Others,Helmets White,CReATe
+Helmets White,,Functional,NA - 42,Others,Helmets White,CReATe
+Helmets White,,Functional,NA - 43,Others,Helmets White,CReATe
+Helmets White,,Functional,NA - 44,Others,Helmets White,CReATe
+Helmets White,,Functional,NA - 45,Others,Helmets White,CReATe
+Helmets White,,Functional,NA - 46,Others,Helmets White,CReATe
+Helmets White,,Functional,NA - 47,Others,Helmets White,CReATe
+Helmets White,,Functional,NA - 48,Others,Helmets White,CReATe
+Helmets Blue,,Functional,NA - 49,Others,Helmets Blue,CReATe
+Helmets Blue,,Functional,NA - 50,Others,Helmets Blue,CReATe
+Helmets Blue,,Functional,NA - 51,Others,Helmets Blue,CReATe
+Helmets Blue,,Functional,NA - 52,Others,Helmets Blue,CReATe
+Helmets Blue,,Functional,NA - 53,Others,Helmets Blue,CReATe
+Glass Funnel Pyrex,,Functional,NA - 54,Others,Glass Funnel Pyrex,CReATe
+Glass Funnel Pyrex,,Functional,NA - 55,Others,Glass Funnel Pyrex,DABE
+Petri Dish,,Functional,NA - 56,Others,Petri Dish,CReATe
+Humidity and Temperature Meter,,Functional,CEGS-22-122,Others,Humidity and Temperature Meter,DABE
+Mechanical Siever,,Functional,CEGS-21-5,Others,Mechanical Siever,CReATe
+JB Combination Wrench,,Functional,NA - 59,Others,JB Combination Wrench,DABE
+Digital Thermometer Data Logger,,Functional,CREATE-0033,Others,Digital Thermometer Data Logger,DABE
+Sliding Glass Door Steel Cabinet,,Functional,RS DAMLRC-22-16,Others,Sliding Glass Door Steel Cabinet,DABE
+Infrared Thermal Imager,,Functional,ATI0224470845,Others,Infrared Thermal Imager,DABE
+Submersible Pump,,Functional,NA - 57,Others,Submersible Pump,DABE
+Combination Plier,,Functional,NA - 58,Others,Combination Plier,DABE
