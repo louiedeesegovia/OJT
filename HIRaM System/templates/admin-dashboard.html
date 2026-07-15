@@ -1,0 +1,238 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Dashboard{% endblock %}
+
+{% block content %}
+<body>
+    <main class="main-content">
+        
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-info">
+                    <p>Total Items</p>
+                    <h3>{{ total_items }}</h3>
+                </div>
+                <i class="fa-solid fa-cube"></i>
+            </div>
+            <div class="stat-card">
+                <div class="stat-info">
+                    <p>Pending Requests</p>
+                    <h3>{{ pending_count }}</h3>
+                </div>
+                <i class="fa-solid fa-clipboard"></i>
+            </div>
+            <div class="stat-card">
+                <div class="stat-info">
+                    <p>Overdue Returns</p>
+                    <h3>{{ overdue_count }}</h3>
+                </div>
+                <i class="fa-solid fa-book"></i>
+            </div>
+        </div>
+
+        <!-- 2x2 Grid of Tables -->
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-top:1.5rem;">
+
+            <!-- Pending -->
+            <div class="table-container">
+                <h2><i class="fa-solid fa-clock" style="color:#facc15;"></i> Pending</h2>
+                <div style="max-height:220px; overflow-y:auto;">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Student</th>
+                                <th>Item</th>
+                                <th>Date</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% set pending = recent_activities|selectattr('status', 'equalto', 'pending')|list %}
+                            {% for req in pending %}
+                            <tr>
+                                <td>
+                                    <strong>{{ req.student.student_nm }}</strong><br>
+                                    <span style="font-size:11px; opacity:0.6;">{{ req.student.student_number }}</span>
+                                </td>
+                                <td>{{ req.inventory.inventory_nm }}</td>
+                                <td>{{ req.request_date.strftime('%Y-%m-%d') }}</td>
+                                <td><a href="{{ url_for('requests') }}" class="action-btn approve" style="font-size:11px; padding:4px 8px;">Manage</a></td>
+                            </tr>
+                            {% else %}
+                            <tr><td colspan="4">No pending requests.</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Approved -->
+            <div class="table-container">
+                <h2><i class="fa-solid fa-circle-check" style="color:#4ade80;"></i> Approved</h2>
+                <div style="max-height:220px; overflow-y:auto;">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Student</th>
+                                <th>Item</th>
+                                <th>Borrow Date</th>
+                                <th>Return Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% set approved = recent_activities|selectattr('status', 'equalto', 'approved')|list %}
+                            {% for req in approved %}
+                            <tr>
+                                <td>
+                                    <strong>{{ req.student.student_nm }}</strong><br>
+                                    <span style="font-size:11px; opacity:0.6;">{{ req.student.student_number }}</span>
+                                </td>
+                                <td>{{ req.inventory.inventory_nm }}</td>
+                                <td>{{ req.borrow_date.strftime('%Y-%m-%d') if req.borrow_date else 'N/A' }}</td>
+                                <td>{{ req.return_date.strftime('%Y-%m-%d') if req.return_date else 'N/A' }}</td>
+                            </tr>
+                            {% else %}
+                            <tr><td colspan="4">No approved requests.</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- OverDue -->
+            <div class="table-container">
+                <h2><i class="fa-solid fa-circle-xmark" style="color:#f87171;"></i> OverDue</h2>
+                <div style="max-height:220px; overflow-y:auto;">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Student</th>
+                                <th>Item</th>
+                                <th>Return Date</th>
+                                <th>Student Contact</th>
+                                <th>Remarks</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% set overdue = recent_activities|selectattr('status', 'equalto', 'overdue')|list %}
+                            {% for req in overdue %}
+                            <tr>
+                                <td>
+                                    <strong>{{ req.student.student_nm }}</strong><br>
+                                    <span style="font-size:11px; opacity:0.6;">{{ req.student.student_number }}</span>
+                                </td>
+                                <td>{{ req.inventory.inventory_nm }}</td>
+                                <td>{{ req.return_date.strftime('%Y-%m-%d') if req.return_date else 'N/A' }}</td>
+                                <td>{{ req.contact_number}}</td>
+                                <td>{{ req.remarks or '—' }}</td>
+                                <td><a href="{{ url_for('borrowed_items') }}" class="action-btn approve" style="font-size:11px; padding:4px 8px;">Manage</a></td>
+                            </tr>
+                            {% else %}
+                            <tr><td colspan="4">No Overdue Items.</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Returned -->
+            <div class="table-container">
+                <h2><i class="fa-solid fa-rotate-left" style="color:#a78bfa;"></i> Returned</h2>
+                <div style="max-height:220px; overflow-y:auto;">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Student</th>
+                                <th>Item</th>
+                                <th>Return Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% set returned = recent_activities|selectattr('status', 'equalto', 'returned')|list %}
+                            {% for req in returned %}
+                            <tr>
+                                <td>
+                                    <strong>{{ req.student.student_nm }}</strong><br>
+                                    <span style="font-size:11px; opacity:0.6;">{{ req.student.student_number }}</span>
+                                </td>
+                                <td>{{ req.inventory.inventory_nm }}</td>
+                                <td>{{ req.return_date.strftime('%Y-%m-%d') if req.return_date else 'N/A' }}</td>
+                            </tr>
+                            {% else %}
+                            <tr><td colspan="3">No returned items.</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Recent Activities -->
+        <div class="table-container" style="margin-top:1rem;">
+            <h2>Recent Activities</h2>
+            <div style="max-height:220px; overflow-y:auto;">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Activity</th>
+                            <th>Student</th>
+                            <th>Item</th>
+                            <th>Date</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for act in recent_activities %}
+                        <tr>
+                            <td>
+                                {% if act.status == 'pending' %}
+                                    <i class="fa-solid fa-clock" style="color:#facc15;"></i> Borrow Requested
+                                {% elif act.status == 'approved' %}
+                                    <i class="fa-solid fa-circle-check" style="color:#4ade80;"></i> Request Approved
+                                {% elif act.status == 'rejected' %}
+                                    <i class="fa-solid fa-circle-xmark" style="color:#f87171;"></i> Request Rejected
+                                {% elif act.status == 'borrowed' %}
+                                    <i class="fa-solid fa-hand-holding" style="color:#60a5fa;"></i> Item Borrowed
+                                {% elif act.status == 'returned' %}
+                                    <i class="fa-solid fa-rotate-left" style="color:#a78bfa;"></i> Item Returned
+                                {% elif act.status == 'overdue' %}
+                                    <i class="fa-solid fa-triangle-exclamation" style="color:#fb923c;"></i> Overdue
+                                {% endif %}
+                            </td>
+                            <td>
+                                <strong>{{ act.student.student_nm }}</strong><br>
+                                <span style="font-size:12px; opacity:0.6;">{{ act.student.student_number }}</span>
+                            </td>
+                            <td>{{ act.inventory.inventory_nm }}</td>
+                            <td>{{ act.request_date.strftime('%Y-%m-%d %H:%M') }}</td>
+                            <td>
+                                {% if act.status == 'pending' %}
+                                    <span class="badge pending">Pending</span>
+                                {% elif act.status == 'approved' %}
+                                    <span class="badge approved">Approved</span>
+                                {% elif act.status == 'rejected' %}
+                                    <span class="badge rejected">Rejected</span>
+                                {% elif act.status == 'borrowed' %}
+                                    <span class="badge active-borrow">Borrowed</span>
+                                {% elif act.status == 'returned' %}
+                                    <span class="badge returned">Returned</span>
+                                {% elif act.status == 'overdue' %}
+                                    <span class="badge overdue">Overdue</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="5">No recent activities.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </main>
+</body>
+{% endblock %}
