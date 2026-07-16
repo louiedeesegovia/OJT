@@ -1,0 +1,374 @@
+{% extends "base.html" %}
+
+{% block title %}Borrowed Items Tracking{% endblock %}
+
+{% block content %}
+<body>
+    <!-- Details Modal -->
+    <div id="detailsModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:1000; align-items:center; justify-content:center;">
+        <div style="background:#1a2e1a; padding:2rem; border-radius:12px; width:420px; box-shadow:0 8px 32px rgba(0,0,0,0.4); border:1px solid rgba(255,255,255,0.1);">
+            <h3 style="margin-bottom:1.5rem; color:white;">
+                <i class="fa-solid fa-circle-info"></i> Borrow Details
+            </h3>
+
+            <div style="margin-bottom:1rem;">
+                <label style="font-size:12px; color:rgba(255,255,255,0.5); display:block; margin-bottom:4px;">Borrow ID</label>
+                <p id="detailBorrowId" style="color:white; font-weight:600; margin:0;"></p>
+            </div>
+            <div style="margin-bottom:1rem;">
+                <label style="font-size:12px; color:rgba(255,255,255,0.5); display:block; margin-bottom:4px;">Student Name</label>
+                <p id="detailStudentNm" style="color:white; font-weight:500; margin:0;"></p>
+            </div>
+            <div style="margin-bottom:1rem;">
+                <label style="font-size:12px; color:rgba(255,255,255,0.5); display:block; margin-bottom:4px;">Student Number</label>
+                <p id="detailStudentNo" style="color:white; font-weight:500; margin:0;"></p>
+            </div>
+            <div style="margin-bottom:1rem;">
+                <label style="font-size:12px; color:rgba(255,255,255,0.5); display:block; margin-bottom:4px;">Item</label>
+                <p id="detailItem" style="color:white; font-weight:500; margin:0;"></p>
+            </div>
+            <div style="margin-bottom:1rem;">
+                <label style="font-size:12px; color:rgba(255,255,255,0.5); display:block; margin-bottom:4px;">Serial Number</label>
+                <p id="detailSerial" style="color:white; font-weight:500; margin:0;"></p>
+            </div>
+            <div style="margin-bottom:1rem;">
+                <label style="font-size:12px; color:rgba(255,255,255,0.5); display:block; margin-bottom:4px;">Borrow Date</label>
+                <p id="detailBorrowDate" style="color:white; font-weight:500; margin:0;"></p>
+            </div>
+            <div style="margin-bottom:1rem;">
+                <label style="font-size:12px; color:rgba(255,255,255,0.5); display:block; margin-bottom:4px;">Return Date</label>
+                <p id="detailReturnDate" style="color:white; font-weight:500; margin:0;"></p>
+            </div>
+            <div style="margin-bottom:1rem;">
+                <label style="font-size:12px; color:rgba(255,255,255,0.5); display:block; margin-bottom:4px;">Faculty In Charge</label>
+                <p id="detailFaculty" style="color:white; font-weight:500; margin:0;"></p>
+            </div>
+            <div style="margin-bottom:1rem;">
+                <label style="font-size:12px; color:rgba(255,255,255,0.5); display:block; margin-bottom:4px;">Contact Number</label>
+                <p id="detailContact" style="color:white; font-weight:500; margin:0;"></p>
+            </div>
+            <div style="margin-bottom:1.5rem;">
+                <label style="font-size:12px; color:rgba(255,255,255,0.5); display:block; margin-bottom:4px;">Remarks</label>
+                <p id="detailRemarks" style="color:white; font-weight:500; margin:0;"></p>
+            </div>
+            <!-- Borrowing Calendar -->
+            <div class="cal-section" style="margin-bottom:1.5rem;">
+                <div class="cal-section-title">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+                    Borrowing Schedule
+                </div>
+                <div class="cal-legend">
+                    <span class="cal-legend-item"><span class="cal-dot pending"></span>Pending Request</span>
+                    <span class="cal-legend-item"><span class="cal-dot approved"></span>Approved / Borrowed</span>
+                </div>
+                <div class="cal-nav">
+                    <button class="cal-nav-btn" onclick="shiftMonth(-1)">&#8249;</button>
+                    <span class="cal-month-label" id="calMonthLabel"></span>
+                    <button class="cal-nav-btn" onclick="shiftMonth(1)">&#8250;</button>
+                </div>
+                <div class="cal-grid" id="calGrid"></div>
+            </div>
+
+            <div style="display:flex; justify-content:flex-end;">
+                <button onclick="closeDetailsModal()"
+                    style="padding:0.5rem 1.25rem; border-radius:20px; border:1px solid rgba(255,255,255,0.3); background:transparent; color:white; cursor:pointer;">
+                    Close
+                </button>
+            </div>
+        </div>
+        
+    </div>
+    <!-- Return Modal -->
+    <div id="returnModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:1000; align-items:center; justify-content:center;">
+        <div style="background:#1a2e1a; padding:2rem; border-radius:12px; width:400px; max-height:90vh; overflow-y:auto; box-shadow:0 8px 32px rgba(0,0,0,0.4); border:1px solid rgba(255,255,255,0.1);">
+            <h3 style="margin-bottom:1.5rem; color:white;">
+                <i class="fa-solid fa-rotate-left"></i> Mark as Returned
+            </h3>
+
+            <p id="returnItemName" style="color:rgba(255,255,255,0.7); font-size:0.85rem; margin-bottom:1.5rem;"></p>
+
+            <form id="returnForm" method="post" action="">
+
+                <div style="margin-bottom:1rem;">
+                    <label style="color:white; font-size:14px; display:block; margin-bottom:8px;">Item Condition upon Return</label>
+                    <select name="returned_condition" id="returnConditionSelect" required
+                        onchange="toggleReturnReportFields()"
+                        style="width:100%; padding:0.75rem; border-radius:8px; border:1px solid rgba(255,255,255,0.2); background:#243824; color:white; outline:none;">
+                        <option value="functional">Functional</option>
+                        <option value="non-functional">Non-Functional (Damaged)</option>
+                        <option value="under-maintenance">Under Maintenance</option>
+                        <option value="under-repair">Under Repair</option>
+                        <option value="lost">Lost</option>
+                    </select>
+                </div>
+
+                <div style="margin-bottom:1.5rem;">
+                    <label style="color:white; font-size:14px; display:block; margin-bottom:8px;">
+                        Remarks <span style="opacity:0.5; font-size:12px;">(optional)</span>
+                    </label>
+                    <textarea name="return_remarks" rows="3" placeholder="Any notes about the returned item..."
+                        style="width:100%; padding:0.75rem; border-radius:8px; border:1px solid rgba(255,255,255,0.2); background:#243824; color:white; resize:none; outline:none;"></textarea>
+                </div>
+
+                <!-- Report fields — shown only for non-functional or lost -->
+                <div id="returnReportFields" style="display:none;">
+                    <hr style="margin-bottom:1rem; border:none; border-top:1px solid rgba(255,255,255,0.1);">
+                    <p style="color:#f87171; font-size:0.85rem; margin-bottom:1rem;">
+                        <i class="fa-solid fa-triangle-exclamation"></i>
+                        A damage/lost report will be automatically filed.
+                    </p>
+
+                    <div style="margin-bottom:1rem;">
+                        <label style="color:white; font-size:14px; display:block; margin-bottom:8px;">Report Type</label>
+                        <select name="report_type" id="returnReportType"
+                            style="width:100%; padding:0.75rem; border-radius:8px; border:1px solid rgba(255,255,255,0.2); background:#243824; color:white; outline:none;">
+                            <option value="damaged">Damaged</option>
+                            <option value="lost">Lost</option>
+                        </select>
+                    </div>
+
+                    <div style="margin-bottom:1.5rem;">
+                        <label style="color:white; font-size:14px; display:block; margin-bottom:8px;">
+                            Report Description <span style="opacity:0.5; font-size:12px;">(optional)</span>
+                        </label>
+                        <textarea name="report_description" rows="3"
+                            placeholder="Describe the damage or circumstances of loss..."
+                            style="width:100%; padding:0.75rem; border-radius:8px; border:1px solid rgba(255,255,255,0.2); background:#243824; color:white; resize:none; outline:none;"></textarea>
+                    </div>
+                </div>
+
+                <div style="display:flex; gap:0.5rem; justify-content:flex-end;">
+                    <button type="button" onclick="closeReturnModal()"
+                        style="padding:0.5rem 1rem; border-radius:20px; border:1px solid rgba(255,255,255,0.3); background:transparent; color:white; cursor:pointer;">
+                        Cancel
+                    </button>
+                    <button type="submit"
+                        style="padding:0.5rem 1rem; border-radius:20px; border:none; background:#22c55e; color:#0f1f0f; font-weight:bold; cursor:pointer;">
+                        <i class="fa-solid fa-check"></i> Confirm Return
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <main class="main-content">
+        
+        <div class="page-header">
+            <h2>Borrowed Items Tracking</h2>
+        </div>
+
+        <div class="controls-container">
+            <form method="get" action="{{ url_for('borrowed_items') }}" style="display:flex;gap:8px;align-items:center;width:100%;">
+                <div class="search-box">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <input type="text" name="q" placeholder="Search by student name, ID, or item..." value="{{ q|default('') }}">
+                    <button class="action-btn" type="submit" style="margin-left:8px;background:rgba(255,255,255,0.1);color:white;border:1px solid rgba(255,255,255,0.2);padding:10px 18px;border-radius:8px;">Search</button>
+                </div>
+                
+            </form>
+        </div>
+
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Borrow ID</th>
+                        <th>Student Details</th>
+                        <th>Item Details</th>
+                        <th>Borrow Date</th>
+                        <th>Return Date</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in items %}
+                    <tr>
+                        <td>BRW-{{ item.borrow_id }}</td>
+                        <td>
+                            <strong>{{ item.student.student_nm }}</strong><br>
+                            <span style="font-size: 12px; color: rgba(255,255,255,0.6);">{{ item.student.student_number }}</span>
+                        </td>
+                        <td>
+                            {{ item.inventory.inventory_nm }}<br>
+                            <span style="font-size: 12px; color: rgba(255,255,255,0.6);">{{ item.inventory.serial_number }}</span>
+                        </td>
+                        <td>{{ item.borrow_date.strftime('%Y-%m-%d') if item.borrow_date else 'N/A' }}</td>
+                        <td>{{ item.return_date.strftime('%Y-%m-%d') if item.return_date else 'N/A' }}</td>
+                        <td>
+                            {% if item.status == 'approved' %}
+                                <span class="badge approved">Approved</span>
+                            {% elif item.status == 'borrowed' %}
+                                <span class="badge active-borrow">Borrowed</span>
+                            {% elif item.status == 'overdue' %}
+                                <span class="badge overdue">Overdue</span>
+                            {% elif item.status == 'returned' %}
+                                <span class="badge returned">Returned</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <button class="action-btn details-btn"
+                                onclick="openDetailsModal('{{ item.borrow_id }}', '{{ item.student.student_nm }}', '{{ item.student.student_number }}', '{{ item.inventory.inventory_nm }}', '{{ item.inventory.serial_number }}', '{{ item.borrow_date.strftime('%Y-%m-%d') if item.borrow_date else 'N/A' }}', '{{ item.return_date.strftime('%Y-%m-%d') if item.return_date else 'N/A' }}', '{{ item.faculty_incharge or 'N/A' }}', '{{ item.contact_number or 'N/A' }}', '{{ item.remarks or 'N/A' }}', {{ item.inventory_id }})">
+                                Details
+                            {% if item.status in ['approved', 'borrowed', 'overdue'] %}
+                            <button class="action-btn return-btn"
+                                data-borrow-id="{{ item.borrow_id }}"
+                                data-item="{{ item.inventory.inventory_nm }}"
+                                onclick="openReturnModal(this)">
+                                <i class="fa-solid fa-check"></i> Mark Returned
+                            </button>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="7">No borrowed items found.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+    </main>
+</body>
+<script>
+    function openDetailsModal(borrowId, studentNm, studentNo, item, serial, borrowDate, returnDate, faculty, contact, remarks) {
+        document.getElementById('detailBorrowId').textContent = 'BRW-' + borrowId;
+        document.getElementById('detailStudentNm').textContent = studentNm;
+        document.getElementById('detailStudentNo').textContent = studentNo;
+        document.getElementById('detailItem').textContent = item;
+        document.getElementById('detailSerial').textContent = serial;
+        document.getElementById('detailBorrowDate').textContent = borrowDate;
+        document.getElementById('detailReturnDate').textContent = returnDate;
+        document.getElementById('detailFaculty').textContent = faculty;
+        document.getElementById('detailContact').textContent = contact;
+        document.getElementById('detailRemarks').textContent = remarks;
+        document.getElementById('detailsModal').style.display = 'flex';
+    }
+
+    function closeDetailsModal() {
+        document.getElementById('detailsModal').style.display = 'none';
+    }
+
+    document.getElementById('detailsModal').addEventListener('click', function(e) {
+        if (e.target === this) closeDetailsModal();
+    });
+
+   
+    let calViewYear = new Date().getFullYear();
+    let calViewMonth = new Date().getMonth();
+    let currentItemBookings = [];
+
+    async function fetchItemBookings(itemId) {
+        try {
+            const res = await fetch(`/student/item/${itemId}/bookings`);
+            if (res.ok) {
+                const data = await res.json();
+                return data.bookings;
+            }
+        } catch (_) {}
+        return [];
+    }
+
+    function renderCalendar() {
+        const label = document.getElementById('calMonthLabel');
+        const grid = document.getElementById('calGrid');
+        const monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+        label.textContent = `${monthNames[calViewMonth]} ${calViewYear}`;
+
+        const bookingMap = {};
+        currentItemBookings.forEach(b => { bookingMap[b.date] = b.status; });
+
+        const firstDay = new Date(calViewYear, calViewMonth, 1).getDay();
+        const daysInMonth = new Date(calViewYear, calViewMonth + 1, 0).getDate();
+        const today = new Date();
+        const todayStr = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-${String(today.getDate()).padStart(2,'0')}`;
+
+        let html = '';
+        ['Su','Mo','Tu','We','Th','Fr','Sa'].forEach(d => {
+            html += `<div class="cal-day-header">${d}</div>`;
+        });
+        for (let i = 0; i < firstDay; i++) html += `<div class="cal-cell empty"></div>`;
+        for (let d = 1; d <= daysInMonth; d++) {
+            const dateStr = `${calViewYear}-${String(calViewMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+            const status = bookingMap[dateStr];
+            let cls = 'cal-cell';
+            if (dateStr === todayStr) cls += ' today';
+            if (status === 'pending') cls += ' cal-pending';
+            if (status === 'approved') cls += ' cal-approved';
+            const tip = status === 'pending' ? 'Pending request' : status === 'approved' ? 'Approved / Borrowed' : '';
+            html += `<div class="${cls}" title="${tip}">${d}${status ? `<span class="cal-indicator ${status}"></span>` : ''}</div>`;
+        }
+        grid.innerHTML = html;
+    }
+
+    function shiftMonth(dir) {
+        calViewMonth += dir;
+        if (calViewMonth > 11) { calViewMonth = 0; calViewYear++; }
+        if (calViewMonth < 0)  { calViewMonth = 11; calViewYear--; }
+        renderCalendar();
+    }
+
+    async function openDetailsModal(borrowId, studentNm, studentNo, item, serial, borrowDate, returnDate, faculty, contact, remarks, inventoryId) {
+        document.getElementById('detailBorrowId').textContent = 'BRW-' + borrowId;
+        document.getElementById('detailStudentNm').textContent = studentNm;
+        document.getElementById('detailStudentNo').textContent = studentNo;
+        document.getElementById('detailItem').textContent = item;
+        document.getElementById('detailSerial').textContent = serial;
+        document.getElementById('detailBorrowDate').textContent = borrowDate;
+        document.getElementById('detailReturnDate').textContent = returnDate;
+        document.getElementById('detailFaculty').textContent = faculty;
+        document.getElementById('detailContact').textContent = contact;
+        document.getElementById('detailRemarks').textContent = remarks;
+
+        // Load calendar
+        const now = new Date();
+        calViewYear = now.getFullYear();
+        calViewMonth = now.getMonth();
+        currentItemBookings = await fetchItemBookings(inventoryId);
+        renderCalendar();
+
+        document.getElementById('detailsModal').style.display = 'flex';
+    }
+
+    function closeDetailsModal() {
+        document.getElementById('detailsModal').style.display = 'none';
+    }
+
+    document.getElementById('detailsModal').addEventListener('click', function(e) {
+        if (e.target === this) closeDetailsModal();
+    });
+
+    function openReturnModal(btn) {
+        const borrowId = btn.dataset.borrowId;
+        const itemName = btn.dataset.item;
+
+        document.getElementById('returnItemName').textContent = 'Item: ' + itemName;
+        document.getElementById('returnForm').action = `/admin/borrowed-items/return/${borrowId}`;
+        document.getElementById('returnModal').style.display = 'flex';
+    }
+
+    function closeReturnModal() {
+        document.getElementById('returnModal').style.display = 'none';
+        document.getElementById('returnForm').reset();
+    }
+
+    document.getElementById('returnModal').addEventListener('click', function(e) {
+        if (e.target === this) closeReturnModal();
+    });
+    function toggleReturnReportFields() {
+        const select = document.getElementById('returnConditionSelect');
+        const reportFields = document.getElementById('returnReportFields');
+        const reportType = document.getElementById('returnReportType');
+        const bad = ['non-functional', 'lost'];
+
+        if (bad.includes(select.value)) {
+            reportFields.style.display = 'block';
+            // Auto-match report type to condition
+            reportType.value = select.value === 'lost' ? 'lost' : 'damaged';
+        } else {
+            reportFields.style.display = 'none';
+        }
+    }
+</script>
+{% endblock %}
