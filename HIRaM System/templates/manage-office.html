@@ -1,0 +1,204 @@
+{% extends "base.html" %}
+
+{% block title %}Office Management{% endblock %}
+
+{% block content %}
+
+<body>
+    <main class="main-content">
+
+        <div class="page-header">
+            <h2>Office List</h2>
+            <button id="openAddModal" class="action-btn add-btn"><i class="fa-solid fa-plus"></i> Add Office</button>
+        </div>
+
+        <!-- Add Office Modal -->
+        <div id="addModal" class="modal" style="display:none;">
+            <div class="modal-content">
+                <span id="closeAddModal" class="modal-close">&times;</span>
+                <h3>Add Office</h3>
+                <form method="post" action="{{ url_for('office') }}">
+                    {{ add_form.hidden_tag() }}
+                    <div class="form-row">
+                        {{ add_form.name.label }}
+                        {{ add_form.name(class="input-field") }}
+                    </div>
+                    <div class="form-row">
+                        {{ add_form.location.label }}
+                        {{ add_form.location(class="input-field") }}
+                    </div>
+                    <div class="form-row">
+                        {{ add_form.submit(class="action-btn") }}
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <style>
+            .modal{position:fixed;left:0;top:0;width:100%;height:100%;background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;z-index:99999}
+            .modal-content{background:#fff;padding:20px;border-radius:6px;max-width:480px;width:100%;box-shadow:0 8px 24px rgba(0,0,0,0.2);z-index:100000}
+            .modal-close{float:right;font-size:22px;cursor:pointer}
+            .form-row{margin-bottom:10px}
+            .input-field{width:100%;padding:8px;color:#000;background:#fff;border:1px solid #ccc;border-radius:4px}
+            .modal label{display:block;margin-bottom:6px;color:#111;font-weight:600}
+            .table-container{position:relative;z-index:1}
+        </style>
+
+        <script>
+            document.addEventListener('DOMContentLoaded', function(){
+                const openBtn = document.getElementById('openAddModal');
+                const modal = document.getElementById('addModal');
+                const closeBtn = document.getElementById('closeAddModal');
+                if(modal && modal.parentNode !== document.body){ document.body.appendChild(modal); }
+                if(openBtn){ openBtn.addEventListener('click', (e)=>{ e.preventDefault(); modal.style.display='flex'; }); }
+                if(closeBtn){ closeBtn.addEventListener('click', ()=> modal.style.display='none'); }
+                window.addEventListener('click', (e)=>{ if(e.target === modal) modal.style.display='none'; });
+            });
+        </script>
+
+        <div class="controls-container">
+            <form method="get" action="{{ url_for('office') }}" style="display:flex;gap:8px;align-items:center;width:100%;">
+                <div class="search-box">
+                    <input name="q" type="text" placeholder="Search" value="{{ q }}">
+                    <button class="action-btn" type="submit" style="margin-left:8px;background:rgba(255,255,255,0.1);color:white;border:1px solid rgba(255,255,255,0.2);padding:10px 18px;border-radius:8px;">Search</button>
+                </div>
+                
+            </form>
+        </div>
+
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Office ID</th>
+                        <th>Office Name</th>
+                        <th>Location</th>
+                        <th>Faculty in Charge</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for it in offices %}
+                    <tr>
+                        <td>{{ it.office_id }}</td>
+                        <td>{{ it.office_nm }}</td>
+                        <td>{{ it.office_loc }}</td>
+                        <td>
+                            {% if it.approver_config %}
+                                {{ it.approver_config.faculty.faculty_nm }}
+                            {% else %}
+                                <em>Unassigned</em>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <button class="icon-btn edit-btn" 
+                                data-id="{{ it.office_id }}"
+                                data-name="{{ it.office_nm }}"
+                                data-location="{{ it.office_loc }}"
+                            ><i class="fa-solid fa-pen-to-square"></i></button>
+                            <form method="post" action="{{ url_for('delete_office', office_id=it.office_id) }}" style="display:inline;">
+                                {{ add_form.csrf_token }}
+                                <button class="icon-btn delete-btn" type="submit"><i class="fa-solid fa-trash"></i></button>
+                            </form>
+                            <button class="icon-btn assign-btn"
+                                data-id="{{ it.office_id }}"
+                                data-name="{{ it.office_nm }}"
+                            >Assign in Charge</button>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="4">No offices found.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Edit Office Modal -->
+        <div id="editModal" class="modal" style="display:none;">
+            <div class="modal-content">
+                <span id="closeEditModal" class="modal-close">&times;</span>
+                <h3>Edit Office</h3>
+                <form id="editForm" method="post" action="">
+                    {{ add_form.csrf_token }}
+                    <div class="form-row">
+                        <label for="edit-name">Office Name</label>
+                        <input id="edit-name" name="name" class="input-field" />
+                    </div>
+                    <div class="form-row">
+                        <label for="edit-location">Location</label>
+                        <input id="edit-location" name="location" class="input-field" />
+                    </div>
+                    <div class="form-row">
+                        <button class="action-btn" type="submit">Save Changes</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+         <!-- Assign Approver Modal -->
+        <div id="assignModal" class="modal" style="display:none;">
+            <div class="modal-content">
+                <span id="closeAssignModal" class="modal-close">&times;</span>
+                <h3>Assign in Charge</h3>
+                <form id="assignForm" method="post" action="">
+                    {{ add_form.csrf_token }}
+                    <div class="form-row">
+                        <label for="faculty_id">Select Faculty</label>
+                        <select id="faculty_id" name="faculty_id" class="input-field">
+                            {% for f in faculty_list %}
+                                <option value="{{ f.faculty_id }}">{{ f.faculty_nm }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-row">
+                        <button class="action-btn" type="submit">Assign</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <script>
+            document.addEventListener('DOMContentLoaded', function(){
+                const editModal = document.getElementById('editModal');
+                const closeEdit = document.getElementById('closeEditModal');
+                const editForm = document.getElementById('editForm');
+
+                document.querySelectorAll('.edit-btn').forEach(btn=>{
+                    btn.addEventListener('click', (e)=>{
+                        e.preventDefault();
+                        const id = btn.dataset.id;
+                        document.getElementById('edit-name').value = btn.dataset.name || '';
+                        document.getElementById('edit-location').value = btn.dataset.location || '';
+                        editForm.action = `/admin/office/edit/${id}`;
+                        if(editModal.parentNode !== document.body){ document.body.appendChild(editModal); }
+                        editModal.style.display='flex';
+                    });
+                });
+                if(closeEdit) closeEdit.addEventListener('click', ()=> editModal.style.display='none');
+                window.addEventListener('click', (e)=>{ if(e.target === editModal) editModal.style.display='none'; });
+            });
+            document.addEventListener('DOMContentLoaded', function(){
+                const assignModal = document.getElementById('assignModal');
+                const closeAssign = document.getElementById('closeAssignModal');
+                const assignForm = document.getElementById('assignForm');
+
+                document.querySelectorAll('.assign-btn').forEach(btn=>{
+                    btn.addEventListener('click', (e)=>{
+                        e.preventDefault();
+                        const id = btn.dataset.id;
+                        assignForm.action = `/admin/office/assign/${id}`;
+                        if(assignModal.parentNode !== document.body){ document.body.appendChild(assignModal); }
+                        assignModal.style.display='flex';
+                    });
+                });
+                if(closeAssign) closeAssign.addEventListener('click', ()=> assignModal.style.display='none');
+                window.addEventListener('click', (e)=>{ if(e.target === assignModal) assignModal.style.display='none'; });
+            });
+        </script>
+
+    </main>
+
+</body>
+
+{% endblock %}
