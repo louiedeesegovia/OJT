@@ -1,0 +1,421 @@
+{% extends "base.html" %}
+
+{% block content %}
+<main class="main-content">
+    <div class="page-header">
+        <h2>Inventory List</h2>
+        <div style="display:flex; gap:8px; align-items:center;">
+            <!-- Download Template -->
+            <a href="{{ url_for('download_template') }}">
+                <button class="action-btn" type="button" style="background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.2);">
+                    <i class="fa-solid fa-download"></i> Template
+                </button>
+            </a>
+
+            <!-- Import CSV -->
+            <form method="post" action="{{ url_for('import_inventory') }}" enctype="multipart/form-data" style="display:inline;">
+                {{ add_form.csrf_token }}
+                <label for="csv_file" class="action-btn" style="cursor:pointer; background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.2);">
+                    <i class="fa-solid fa-file-import"></i> Import CSV
+                </label>
+                <input type="file" id="csv_file" name="csv_file" accept=".csv" style="display:none;"
+                    onchange="this.form.submit()">
+            </form>
+
+            <!-- Add New Item -->
+            <button id="openModalBtn" class="action-btn add-btn">
+                <i class="fa-solid fa-plus"></i> Add New Item
+            </button>
+        </div>
+    </div>
+    <div class="controls-container" style="margin-bottom: 1rem;">
+    <form method="get" action="{{ url_for('inventory') }}" style="display:flex; gap:8px; align-items:center;">
+        <div class="search-box">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input type="text" name="q" placeholder="Search by name, serial, or category..." value="{{ q|default('') }}">
+        </div>
+        <button class="action-btn" type="submit">Search</button>
+    </form>
+    </div>
+
+    <div id="itemModal" class="modal" style="display:none;">
+        <div class="modal-content">
+            <span id="closeModal" class="modal-close">&times;</span>
+            <h3 id="modalTitle">Add Inventory Item</h3>
+            <form id="itemForm" method="post" action="{{ url_for('inventory') }}">
+                {{ add_form.hidden_tag() }}
+                <div class="form-row">
+                    {{ add_form.name.label }}
+                    <input id="item-name" name="name" class="input-field" />
+                </div>
+                <div class="form-row">
+                    {{ add_form.desc.label }}
+                    <input id="item-desc" name="desc" class="input-field" />
+                </div>
+                <div class="form-row">
+                    {{ add_form.condition.label }}
+                    <select id="item-condition" name="condition" class="input-field">
+                        <option value="functional">Functional</option>
+                        <option value="non-functional">Non Functional</option>
+                        <option value="under repair">Under Repair</option>
+                        <option value="under-maintenance">Under Maintenance</option>
+                    </select>
+                </div>
+                <div class="form-row">
+                    {{ add_form.serial.label }}
+                    <input id="item-serial" name="serial" class="input-field" />
+                </div>
+                <div class="form-row">
+                    {{ add_form.category.label }}
+                    <input id="item-category" name="category" class="input-field" />
+                </div>
+                <div class="form-row">
+                    {{ add_form.itemkind.label }}
+                    <input id="item-itemkind" name="itemkind" class="input-field" placeholder="e.g. Laptop, Projector..." />
+                </div>
+                <div class="form-row">
+                    {{ add_form.office.label }}
+                    <select id="item-office" name="office" class="input-field">
+                        {% for o in office_list %}
+                        <option value="{{ o.office_id }}">{{ o.office_nm }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-row">
+                    <button id="itemSubmit" class="action-btn" type="submit">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="detailsModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:99999; align-items:center; justify-content:center;">
+        <div style="background:#1a2e1a; padding:2rem; border-radius:12px; width:420px; box-shadow:0 8px 32px rgba(0,0,0,0.4); border:1px solid rgba(255,255,255,0.1);">
+            <h3 style="margin-bottom:1.5rem; color:white;">
+                <i class="fa-solid fa-circle-info"></i> Item Details
+            </h3>
+
+            <div style="margin-bottom:1rem;">
+                <label style="font-size:12px; color:rgba(255,255,255,0.5); display:block; margin-bottom:4px;">Item Name</label>
+                <p id="detailName" style="color:white; font-weight:600; margin:0;"></p>
+            </div>
+
+            <div style="margin-bottom:1rem;">
+                <label style="font-size:12px; color:rgba(255,255,255,0.5); display:block; margin-bottom:4px;">Description</label>
+                <p id="detailDesc" style="color:white; font-weight:500; margin:0;"></p>
+            </div>
+
+            <div style="margin-bottom:1rem;">
+                <label style="font-size:12px; color:rgba(255,255,255,0.5); display:block; margin-bottom:4px;">Condition</label>
+                <p id="detailCondition" style="color:white; font-weight:500; margin:0;"></p>
+            </div>
+
+            <div style="margin-bottom:1rem;">
+                <label style="font-size:12px; color:rgba(255,255,255,0.5); display:block; margin-bottom:4px;">Serial Number</label>
+                <p id="detailSerial" style="color:white; font-weight:500; margin:0;"></p>
+            </div>
+
+            <div style="margin-bottom:1rem;">
+                <label style="font-size:12px; color:rgba(255,255,255,0.5); display:block; margin-bottom:4px;">Category</label>
+                <p id="detailCategory" style="color:white; font-weight:500; margin:0;"></p>
+            </div>
+
+            <div style="margin-bottom:1.5rem;">
+                <label style="font-size:12px; color:rgba(255,255,255,0.5); display:block; margin-bottom:4px;">Office</label>
+                <p id="detailOffice" style="color:white; font-weight:500; margin:0;"></p>
+            </div>
+
+            <div style="display:flex; justify-content:flex-end;">
+                <button onclick="closeDetailsModal()"
+                    style="padding:0.5rem 1.25rem; border-radius:20px; border:1px solid rgba(255,255,255,0.3); background:transparent; color:white; cursor:pointer;">
+                    Close
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Item ID</th>
+                    <th>Item Name</th>
+                    <th>Available</th>
+                    <th>Status</th>
+                    <th>Office</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for it in items %}
+                <tr>
+                    <td>{{ it.id }}</td>
+                    <td>{{ it.name }}</td>
+                    <td>{{ 'Yes' if it.available else 'No' }}</td>
+                    <td>{{ it.condition }}</td>
+                    <td>{{ it.office }}</td>
+                    <td>
+                        <div class="action-group">
+                            <button class="action-btn details-btn" 
+                                onclick="openDetailsModal('{{ it.name }}', '{{ it.desc or 'N/A' }}', '{{ it.condition }}', '{{ it.serial }}', '{{ it.category }}', '{{ it.office }}')"
+                                title="Details">
+                                Details
+                            </button>
+                            <button class="icon-btn edit-btn" 
+                                data-id="{{ it.id }}"
+                                data-name="{{ it.name }}"
+                                data-desc="{{ it.desc }}"
+                                data-condition="{{ it.condition }}"
+                                data-serial="{{ it.serial }}"
+                                data-category="{{ it.category }}"
+                                data-itemkind="{{ it.itemkind or '' }}"
+                                data-office="{{ it.office }}"
+                                title="Edit"
+                            ><i class="fa-solid fa-pen-to-square"></i></button>
+                            <form method="post" action="{{ url_for('delete_inventory', item_id=it.id) }}" style="display:contents;">
+                                {{ add_form.csrf_token }}
+                                <button class="icon-btn delete-btn" type="submit" title="Delete"><i class="fa-solid fa-trash"></i></button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="6">No inventory items found.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% if total_pages is defined and total_pages > 1 %}
+        <div class="pagination-container">
+            {% if current_page > 1 %}
+                <a href="{{ url_for('inventory', page=current_page-1, q=q|default('')) }}" class="page-btn">&laquo; Prev</a>
+            {% else %}
+                <span class="page-btn disabled">&laquo; Prev</span>
+            {% endif %}
+
+            {% for p in range(1, total_pages + 1) %}
+                {% if p == 1 or p == total_pages or (p >= current_page - 2 and p <= current_page + 2) %}
+                    <a href="{{ url_for('inventory', page=p, q=q|default('')) }}" class="page-btn {% if p == current_page %}active{% endif %}">
+                        {{ p }}
+                    </a>
+                {% elif p == current_page - 3 or p == current_page + 3 %}
+                    <span class="page-btn disabled" style="border: none; background: transparent; padding: 8px 4px;">...</span>
+                {% endif %}
+            {% endfor %}
+
+            {% if current_page < total_pages %}
+                <a href="{{ url_for('inventory', page=current_page+1, q=q|default('')) }}" class="page-btn">Next &raquo;</a>
+            {% else %}
+                <span class="page-btn disabled">Next &raquo;</span>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+
+    
+
+    <style>
+        .modal { position: fixed; left:0; top:0; width:100%; height:100%; background: rgba(0,0,0,0.5); display:flex; align-items:center; justify-content:center; z-index:99999; }
+        .modal-content { background:#fff; padding:20px; border-radius:6px; max-width:480px; width:100%; box-shadow:0 8px 24px rgba(0,0,0,0.2); z-index:100000; }
+        .modal-close { float:right; font-size:22px; cursor:pointer; }
+        .form-row { margin-bottom:10px; }
+        .input-field { width:100%; padding:8px; color:#000; background:#fff; border:1px solid #ccc; border-radius:4px; }
+        .modal label { display:block; margin-bottom:6px; font-weight:600; color:#111; }
+        .table-container { position:relative; z-index:1; }
+
+        /* Pagination Styles */
+        .pagination-container {
+            display: flex;
+            justify-content: flex-end; 
+            flex-wrap: wrap; 
+            gap: 8px;
+            margin-top: 20px;
+        }
+        .page-btn {
+            padding: 8px 14px;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 6px;
+            color: white;
+            text-decoration: none;
+            font-size: 14px;
+            transition: 0.3s;
+        }
+        .page-btn:hover:not(.disabled) {
+            background: rgba(40, 167, 69, 0.4);
+            border-color: #4ade80;
+        }
+        .page-btn.active {
+            background: #05641f;
+            border-color: #4ade80;
+            font-weight: bold;
+        }
+        .page-btn.disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        /* Light Mode Overrides for Pagination */
+        body.light-mode .page-btn {
+            background: rgba(255, 255, 255, 0.85);
+            border: 1px solid rgba(0, 0, 0, 0.2);
+            color: #333;
+        }
+        body.light-mode .page-btn:hover:not(.disabled) {
+            background: rgba(0, 123, 255, 0.1);
+            border-color: #007BFF;
+        }
+        body.light-mode .page-btn.active {
+            background: #007BFF;
+            color: white;
+            border-color: #0056b3;
+        }
+
+        /* ── Mobile only: stack action buttons vertically like the screenshot ── */
+        @media (max-width: 768px) {
+            .page-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+            .page-header .action-btn.add-btn {
+                width: 100%;
+                justify-content: center;
+            }
+            .controls-container form {
+                flex-direction: column;
+                width: 100%;
+            }
+            .controls-container .search-box { width: 100%; }
+            .controls-container .action-btn[type="submit"] {
+                width: 100%;
+                justify-content: center;
+            }
+            .table-container { overflow-x: auto; }
+            table { min-width: 420px; }
+            .action-group {
+                display: flex;
+                flex-direction: column;
+                align-items: stretch;
+                gap: 5px;
+                min-width: 100px;
+            }
+            .action-btn.details-btn {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                padding: 6px 10px;
+                font-size: 12px;
+                border-radius: 6px;
+                border: 1px solid rgba(255,255,255,0.5);
+                background: rgba(255,255,255,0.92);
+                color: #111;
+                white-space: nowrap;
+                cursor: pointer;
+                width: 100%;
+                transition: background 0.2s;
+            }
+            .action-btn.details-btn:hover { background: rgba(255,255,255,1); }
+            .icon-btn.edit-btn {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                width: 100%;
+                height: 30px;
+                border-radius: 6px;
+                border: 1px solid rgba(40,167,69,0.6);
+                background: rgba(40,167,69,0.25);
+                color: #4ade80;
+                font-size: 13px;
+                cursor: pointer;
+                flex-shrink: 0;
+                transition: background 0.2s;
+            }
+            .icon-btn.edit-btn:hover { background: rgba(40,167,69,0.45); }
+            .icon-btn.delete-btn {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                width: 100%;
+                height: 30px;
+                border-radius: 6px;
+                border: 1px solid rgba(220,53,69,0.6);
+                background: rgba(220,53,69,0.25);
+                color: #f87171;
+                font-size: 13px;
+                cursor: pointer;
+                flex-shrink: 0;
+                transition: background 0.2s;
+            }
+            .icon-btn.delete-btn:hover { background: rgba(220,53,69,0.45); }
+            .modal-content { width: 92% !important; margin: 0 auto; }
+            .pagination-container {
+                justify-content: center;
+                flex-wrap: wrap;
+            }
+        }
+    </style>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const modal = document.getElementById('itemModal');
+            const openBtn = document.getElementById('openModalBtn');
+            const closeBtn = document.getElementById('closeModal');
+            const form = document.getElementById('itemForm');
+            const modalTitle = document.getElementById('modalTitle');
+            const submitBtn = document.getElementById('itemSubmit');
+
+            // Add Item
+            openBtn.addEventListener('click', e => {
+                e.preventDefault();
+                modalTitle.textContent = 'Add Inventory Item';
+                submitBtn.textContent = 'Add';
+                form.action = '{{ url_for("inventory") }}';
+                form.reset();
+                modal.style.display = 'flex';
+            });
+
+            // Edit Item
+            document.querySelectorAll('.edit-btn').forEach(btn => {
+                btn.addEventListener('click', e => {
+                    e.preventDefault();
+                    const id = btn.dataset.id;
+                    modalTitle.textContent = 'Edit Inventory Item';
+                    submitBtn.textContent = 'Save Changes';
+                    form.action = `/admin/inventory/edit/${id}`;
+
+                    document.getElementById('item-name').value = btn.dataset.name || '';
+                    document.getElementById('item-desc').value = btn.dataset.desc || '';
+                    document.getElementById('item-condition').value = btn.dataset.condition || 'functional';
+                    document.getElementById('item-serial').value = btn.dataset.serial || '';
+                    document.getElementById('item-category').value = btn.dataset.category || '';
+                    document.getElementById('item-office').value = btn.dataset.office || '';
+
+                    modal.style.display = 'flex';
+                });
+            });
+
+            // Close Modal
+            closeBtn.addEventListener('click', ()=> modal.style.display='none');
+            window.addEventListener('click', e => { if(e.target === modal) modal.style.display='none'; });
+        });
+        function openDetailsModal(name, desc, condition, serial, category, office) {
+                document.getElementById('detailName').textContent = name;
+                document.getElementById('detailDesc').textContent = desc;
+                document.getElementById('detailCondition').textContent = condition;
+                document.getElementById('detailSerial').textContent = serial;
+                document.getElementById('detailCategory').textContent = category;
+                document.getElementById('detailOffice').textContent = office;
+                document.getElementById('detailsModal').style.display = 'flex';
+            }
+
+        function closeDetailsModal() {
+            document.getElementById('detailsModal').style.display = 'none';
+        }
+
+        document.getElementById('detailsModal').addEventListener('click', function(e) {
+            if (e.target === this) closeDetailsModal();
+        });
+    </script>
+</main>
+{% endblock %}
