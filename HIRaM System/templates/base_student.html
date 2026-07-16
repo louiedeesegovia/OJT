@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{% block title %}Inventory System{% endblock %}</title>
+
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
+    <link rel ="icon" type ="image/png" href="{{ url_for('static', filename='img/CSU-logo.png') }}">
+</head>
+
+<body>
+
+<!-- Sidebar -->
+
+<div class="sidebar">
+
+    <h2>Inventory</h2>
+
+    <a href="/">Dashboard</a>
+    <a href="/inventory">Inventory</a>
+    <a href="/add_inventory">Add Item</a>
+    <a href="/students">Students</a>
+    <a href="/borrow">Borrow</a>
+
+</div>
+
+<!-- Main section -->
+
+<div class="main">
+
+    <div class="topbar">
+        Inventory Management System - Student View
+    </div>
+
+    <div class="content">
+
+        {% block content %}
+        {% endblock %}
+
+    </div>
+
+</div>
+
+</body>
+</html>
