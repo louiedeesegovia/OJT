@@ -1,0 +1,192 @@
+{% extends "base.html" %}
+
+{% block content %}
+<body>
+    <main class="main-content">
+        
+        <div class="page-header">
+            <h2>System Reports</h2>
+            <a href="{{ url_for('export_csv', month=month_filter, date_from=date_from, date_to=date_to) }}">
+                <button class="action-btn export-btn">
+                    <i class="fa-solid fa-download"></i> Export to CSV
+                </button>
+            </a>
+        </div>
+
+        <div class="controls-container date-filters">
+            <form method="get" action="{{ url_for('reports') }}" style="display:flex; gap:0.5rem; align-items:center; flex-wrap:wrap;">
+                
+                <!-- Month filter -->
+                <div class="search-box">
+                    <span style="padding-left: 15px; color: rgba(255,255,255,0.7);">Month:</span>
+                    <input type="month" name="month" value="{{ month_filter }}" style="padding-left: 10px; color: white; width: auto;">
+                </div>
+
+                <span style="color: rgba(255,255,255,0.4); font-size:0.85rem;">or</span>
+
+                <!-- Date range -->
+                <div class="search-box">
+                    <span style="padding-left: 15px; color: rgba(255,255,255,0.7);">From:</span>
+                    <input type="date" name="date_from" value="{{ date_from }}" style="padding-left: 10px;">
+                </div>
+                <div class="search-box">
+                    <span style="padding-left: 15px; color: rgba(255,255,255,0.7);">To:</span>
+                    <input type="date" name="date_to" value="{{ date_to }}" style="padding-left: 10px;">
+                </div>
+
+                <button class="action-btn generate-btn" type="submit">Generate Report</button>
+
+                {% if month_filter or date_from or date_to %}
+                <a href="{{ url_for('reports') }}">
+                    <button type="button" class="action-btn" style="background:rgba(255,255,255,0.1);">
+                        <i class="fa-solid fa-xmark"></i> Clear
+                    </button>
+                </a>
+                {% endif %}
+
+            </form>
+        </div>
+
+        <!-- Active filter indicator -->
+        {% if month_filter %}
+        <p style="color: rgba(255,255,255,0.5); font-size:0.85rem; margin-bottom:1rem;">
+            <i class="fa-solid fa-filter"></i>
+            Showing results for <strong style="color:white;">{{ month_filter | replace('-', ' ') }}</strong>
+        </p>
+        {% elif date_from or date_to %}
+        <p style="color: rgba(255,255,255,0.5); font-size:0.85rem; margin-bottom:1rem;">
+            <i class="fa-solid fa-filter"></i>
+            Showing results from <strong style="color:white;">{{ date_from or '...' }}</strong>
+            to <strong style="color:white;">{{ date_to or '...' }}</strong>
+        </p>
+        {% endif %}
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-info">
+                    <p>Total Borrows</p>
+                    <h3>{{ total_borrows }}</h3>
+                </div>
+                <i class="fa-solid fa-handshake"></i>
+            </div>
+            <div class="stat-card">
+                <div class="stat-info">
+                    <p>Most Borrowed</p>
+                    <h3 style="font-size: 20px; margin-top: 8px;">{{ most_borrowed }}</h3>
+                </div>
+                <i class="fa-solid fa-star"></i>
+            </div>
+            <div class="stat-card">
+                <div class="stat-info">
+                    <p>Damage/Lost Reports</p>
+                    <h3 style="color: #f87171;">{{ damage_reports }}</h3>
+                </div>
+                <i class="fa-solid fa-triangle-exclamation"></i>
+            </div>
+        </div>
+
+        <div class="chart-container">
+            <h3>Borrowing Activity (Past 7 Days)</h3>
+            <div class="css-chart">
+                {% for d in daily_counts %}
+                <div class="bar-group">
+                    <div class="bar" style="height: {{ d.height }}%;"></div>
+                    <span>{{ d.day }}</span>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Damage / Lost Reports -->
+        <div class="table-container" style="margin-top: 2rem;">
+            <h3 style="margin-bottom: 1rem;">Damage / Lost Reports</h3>
+            {% if recent_reports %}
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Item</th>
+                        <th>Serial No.</th>
+                        <th>Student</th>
+                        <th>Type</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for r in recent_reports %}
+                    <tr>
+                        <td>{{ r.report_date.strftime('%b %d, %Y') }}</td>
+                        <td>{{ r.inventory.inventory_nm if r.inventory else 'N/A' }}</td>
+                        <td style="color: rgba(255,255,255,0.5); font-size: 0.85rem;">
+                            {{ r.inventory.serial_number if r.inventory else '—' }}
+                        </td>
+                        <td>{{ r.student.student_nm if r.student else 'N/A' }}</td>
+                        <td>
+                            {% if r.report_type == 'lost' %}
+                                <span style="color: #f87171; font-weight: 600;">
+                                    <i class="fa-solid fa-circle-xmark"></i> Lost
+                                </span>
+                            {% else %}
+                                <span style="color: #fb923c; font-weight: 600;">
+                                    <i class="fa-solid fa-triangle-exclamation"></i> Damaged
+                                </span>
+                            {% endif %}
+                        </td>
+                        <td>{{ r.description or '—' }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+                <p style="color: rgba(255,255,255,0.5);">No damage or lost reports filed yet.</p>
+            {% endif %}
+        </div>
+
+        <!-- Equipment Quantity Summary -->
+        <div class="table-container" style="margin-top: 2rem;">
+            <h3 style="margin-bottom: 1rem;">Equipment Quantity Summary</h3>
+            {% if itemkind_summary %}
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Equipment Group</th>
+                        <th>Total Units</th>
+                        <th>Available</th>
+                        <th>Borrowed</th>
+                        <th>Utilization</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in itemkind_summary %}
+                    <tr>
+                        <td>{{ item.name }}</td>
+                        <td>{{ item.total }}</td>
+                        <td style="color: #4ade80;">{{ item.available }}</td>
+                        <td style="color: #f87171;">{{ item.borrowed }}</td>
+                        <td>
+                            {% if item.total > 0 %}
+                                {% set utilization = ((item.borrowed / item.total) * 100) | round | int %}
+                                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                    <div style="flex: 1; background: rgba(255,255,255,0.1); border-radius: 4px; height: 8px;">
+                                        <div style="width: {{ utilization }}%; background: #f87171; border-radius: 4px; height: 8px;"></div>
+                                    </div>
+                                    <span style="font-size: 0.8rem;">{{ utilization }}%</span>
+                                </div>
+                            {% else %}
+                                <span style="color: rgba(255,255,255,0.4);">N/A</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+                <p style="color: rgba(255,255,255,0.5);">No equipment groups found.</p>
+            {% endif %}
+        </div>
+
+        
+
+    </main>
+</body>
+{% endblock %}
