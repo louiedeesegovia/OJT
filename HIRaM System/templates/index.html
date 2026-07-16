@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>HIRaM System</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <link rel="stylesheet" href="{{ url_for('static', filename='landing.css') }}">
+    <link rel ="icon" type ="image/png" href="{{ url_for('static', filename='img/CSU-logo.png') }}">
+</head>
+<body>
+
+    
+
+    <div class="logo"></div>
+
+    <div class="Title">
+        <h1>HIRaM System</h1>
+        <p>Hinang Inventory, Request, and Management System</p>
+    </div>
+
+    <div class="container">
+        <a href="{{ url_for('student_information') }}" class="btn student-btn">Borrowers Portal</a>
+        <a href="{{ url_for('admin') }}" class="btn admin-btn">Admin Log in</a>
+        <div class="link-group">
+         <div class="back-link">
+            <a href="{{ url_for('signup') }}">← Sign up(for faculty)</a>
+            
+         </div>
+         <div class="back-link">
+            <a href="{{ url_for('student_requests') }}"> My Requests →</a>
+         </div>
+        </div>
+    </div>
+    
+
+</body>
+</html>
