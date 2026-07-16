@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}Admin Dashboard - Inventory Management{% endblock %}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='dashboard.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='img/CSU-logo.png') }}">
+</head>
+<body>
+    <!-- Mobile top bar -->
+    <div class="mobile-topbar">
+        <button class="hamburger" onclick="toggleSidebar()" aria-label="Toggle menu">
+            <i class="fa-solid fa-bars"></i>
+        </button>
+        <span class="mobile-title">Admin Panel</span>
+    </div>
+
+    <!-- Sidebar overlay for mobile -->
+    <div class="sidebar-overlay" onclick="closeSidebar()"></div>
+
+    <div class="dashboard-overlay"></div>
+
+    <nav class="sidebar">
+       <div style="display: flex; justify-content: space-between; align-items: center; padding-right: 15px; margin-bottom: 20px;">
+            <h2 style="margin-bottom: 0;">Admin Panel</h2>
+            <button id="theme-toggle" style="background: transparent; border: none; font-size: 20px; color: white; cursor: pointer; transition: 0.3s;">
+                <i class="fa-solid fa-sun"></i>
+            </button>
+        </div>
+
+        <ul class="nav-links">
+            <li><a href="{{ url_for('admin_dashboard') }}"><i class="fa-solid fa-gauge"></i> Dashboard</a></li>
+            <li><a href="{{ url_for('inventory') }}"><i class="fa-solid fa-box-open"></i> Manage Inventory</a></li>
+            <li><a href="{{ url_for('faculty') }}"><i class="fa-solid fa-user-graduate"></i> Manage Faculty</a></li>
+            <li><a href="{{ url_for('office') }}"><i class="fa-solid fa-building"></i> Office</a></li>
+            <li><a href="{{ url_for('requests') }}"><i class="fa-solid fa-clipboard-list"></i> Manage Requests</a></li>
+            <li><a href="{{ url_for('borrowed_items') }}"><i class="fa-solid fa-book-open"></i> Borrowed Items</a></li>
+            <li><a href="{{ url_for('reports') }}"><i class="fa-solid fa-file-lines"></i> Reports</a></li>
+        </ul>
+
+        <div class="logout">
+            {% if session.faculty %}
+            <span style="cursor:pointer;" onclick="openProfileModal()">
+                <i class="fa-solid fa-user"></i> {{ session.faculty.name }}
+            </span>
+            {% endif %}
+            <a href="{{ url_for('admin_logout') }}"><i class="fa-solid fa-arrow-right-from-bracket"></i> Logout</a>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="main">
+        <div class="content">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                <div class="alert alert-{{ category }}" style="
+                    margin: 1rem 2rem 0;
+                    padding: 0.75rem 1rem;
+                    border-radius: 8px;
+                    font-size: 14px;
+                    background: {% if category == 'danger' %}rgba(220,53,69,0.2){% elif category == 'success' %}rgba(40,167,69,0.2){% else %}rgba(255,255,255,0.1){% endif %};
+                    border: 1px solid {% if category == 'danger' %}rgba(220,53,69,0.5){% elif category == 'success' %}rgba(40,167,69,0.5){% else %}rgba(255,255,255,0.2){% endif %};
+                    color: white;">
+                    {{ message }}
+                </div>
+                {% endfor %}
+            {% endif %}
+            {% endwith %}
+
+            {% block content %}
+            {% endblock %}
+        </div>
+    </div>
+
+    <!-- Profile Edit Modal -->
+    <div id="profileModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:9999; align-items:center; justify-content:center;">
+        <div style="background:#1a2e1a; padding:2rem; border-radius:12px; width:400px; box-shadow:0 8px 32px rgba(0,0,0,0.4); border:1px solid rgba(255,255,255,0.1);">
+            <h3 style="margin-bottom:1.5rem; color:white;">
+                <i class="fa-solid fa-user-pen"></i> Edit Profile
+            </h3>
+            <form method="post" action="{{ url_for('edit_profile') }}">
+
+                <div style="margin-bottom:1rem;">
+                    <label style="display:block; color:rgba(255,255,255,0.7); font-size:13px; margin-bottom:4px;">Full Name</label>
+                    <input type="text" name="faculty_nm" value="{{ session.faculty.name if session.faculty else '' }}"
+                        style="width:100%; padding:0.75rem; border-radius:8px; border:1px solid rgba(255,255,255,0.2); background:#243824; color:white; outline:none;">
+                </div>
+
+                <div style="margin-bottom:1rem;">
+                    <label style="display:block; color:rgba(255,255,255,0.7); font-size:13px; margin-bottom:4px;">Username</label>
+                    <input type="text" name="username" value="{{ session.faculty.username if session.faculty else '' }}"
+                        style="width:100%; padding:0.75rem; border-radius:8px; border:1px solid rgba(255,255,255,0.2); background:#243824; color:white; outline:none;">
+                </div>
+
+                <div style="margin-bottom:1rem;">
+                    <label style="display:block; color:rgba(255,255,255,0.7); font-size:13px; margin-bottom:4px;">New Password <span style="opacity:0.5;">(leave blank to keep current)</span></label>
+                    <input type="password" name="password"
+                        style="width:100%; padding:0.75rem; border-radius:8px; border:1px solid rgba(255,255,255,0.2); background:#243824; color:white; outline:none;">
+                </div>
+
+                <div style="margin-bottom:1.5rem;">
+                    <label style="display:block; color:rgba(255,255,255,0.7); font-size:13px; margin-bottom:4px;">Confirm New Password</label>
+                    <input type="password" name="confirm_password"
+                        style="width:100%; padding:0.75rem; border-radius:8px; border:1px solid rgba(255,255,255,0.2); background:#243824; color:white; outline:none;">
+                </div>
+
+                <div style="display:flex; gap:0.5rem; justify-content:flex-end;">
+                    <button type="button" onclick="closeProfileModal()"
+                        style="padding:0.5rem 1rem; border-radius:20px; border:1px solid rgba(255,255,255,0.3); background:transparent; color:white; cursor:pointer;">
+                        Cancel
+                    </button>
+                    <button type="submit"
+                        style="padding:0.5rem 1rem; border-radius:20px; border:none; background:#4ade80; color:#0f1f0f; font-weight:bold; cursor:pointer;">
+                        Save Changes
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Active nav link + modal scripts -->
+    <script>
+        // Active nav link
+        const currentPath = window.location.pathname;
+        document.querySelectorAll('.nav-links a').forEach(link => {
+            const linkPath = new URL(link.href).pathname;
+            if (currentPath === linkPath || (currentPath.startsWith(linkPath) && linkPath !== '/')) {
+                link.classList.add('active');
+            }
+        });
+
+        // Profile modal
+        function openProfileModal() {
+            document.getElementById('profileModal').style.display = 'flex';
+        }
+        function closeProfileModal() {
+            document.getElementById('profileModal').style.display = 'none';
+        }
+        document.getElementById('profileModal').addEventListener('click', function(e) {
+            if (e.target === this) closeProfileModal();
+        });
+        // Mobile sidebar toggle
+        function toggleSidebar() {
+            document.querySelector('.sidebar').classList.toggle('open');
+            document.querySelector('.sidebar-overlay').classList.toggle('active');
+        }
+        function closeSidebar() {
+            document.querySelector('.sidebar').classList.remove('open');
+            document.querySelector('.sidebar-overlay').classList.remove('active');
+        }
+        // Close sidebar when a nav link is clicked on mobile
+        document.querySelectorAll('.nav-links a').forEach(link => {
+            link.addEventListener('click', () => {
+                if (window.innerWidth <= 768) closeSidebar();
+            });
+
+        // Theme Toggle Logic
+        const themeToggleBtn = document.getElementById('theme-toggle');
+        const themeIcon = themeToggleBtn.querySelector('i');
+        const body = document.body;
+
+        // Check local storage to see if the user previously chose light mode
+        const currentTheme = localStorage.getItem('theme');
+        if (currentTheme === 'light') {
+            body.classList.add('light-mode');
+            themeIcon.classList.replace('fa-sun', 'fa-moon');
+            themeToggleBtn.style.color = '#333';
+        }
+
+        // Toggle action on click
+        themeToggleBtn.addEventListener('click', () => {
+            body.classList.toggle('light-mode');
+            
+            if (body.classList.contains('light-mode')) {
+                localStorage.setItem('theme', 'light');
+                themeIcon.classList.replace('fa-sun', 'fa-moon'); // Change to moon icon
+                themeToggleBtn.style.color = '#333';
+            } else {
+                localStorage.setItem('theme', 'dark');
+                themeIcon.classList.replace('fa-moon', 'fa-sun'); // Change back to sun icon
+                themeToggleBtn.style.color = 'white';
+            }
+        });
+});
+    </script>
+
+
+</body>
+</html>
