@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Faculty/Admin Login - Inventory Management</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <link rel="stylesheet" href="{{ url_for('static', filename='landing.css') }}">
+    <link rel ="icon" type ="image/png" href="{{ url_for('static', filename='img/CSU-logo.png') }}">
+</head>
+<body>
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+            <div class="flash flash-{{ category }}">
+                {{ message }}
+            </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <div class="logo"></div>
+
+    <div class="Title">
+        <h1>Admin Login</h1>
+    </div>
+
+    <div class="container">
+        <form method="POST" action ="{{ url_for('admin') }}">
+            {{form.hidden_tag()}}
+            <div class="input-group">
+                
+                {{form.username(class = "form-control", placeholder = "Username")}}
+            </div>
+            
+            <div class="input-group">
+               
+                {{form.password(class = "form-control", placeholder = "Password")}}
+            </div>
+
+            {{form.submit(class = "btn login-btn")}}
+        </form>
+
+        <div class="link-group">
+            <div class="back-link">
+                <a href="{{ url_for('index') }}">← Back to Landing page</a>
+            </div>
+           
+        </div>
+    </div>
+
+</body>
+</html>
