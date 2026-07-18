@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Borrower's Dashboard — CReATe CSU</title>
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='student-dashboard.css') }}">
+  <link rel="icon" type="image/png" href="{{ url_for('static', filename='img/CSU-logo.png') }}">
+</head>
+<body>
+  <!-- Flash Messages -->
+  {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+          {% for category, message in messages %}
+          <div class="flash flash-{{ category }}">
+              {{ message }}
+          </div>
+          {% endfor %}
+      {% endif %}
+  {% endwith %}
+
+<!-- NAV -->
+<nav>
+  <div class="nav-left">
+    <img src="{{ url_for('static', filename='img/CSU-logo.png') }}" alt="CSU Logo" class="nav-logo-img" onerror="this.style.display='none'">
+    <div class="nav-title">
+      Center for Resource Assessment, Analytics and Emerging Technologies
+      <small>Caraga State University</small>
+    </div>
+  </div>
+  <div class="nav-user">
+    <span style="font-size:0.78rem">Hello, {{ student.name }}</span>
+    <a href="{{ url_for('student_cart') }}" class="nav-cart-link" title="My Cart">
+      <div class="nav-cart">
+        <button class="nav-btn nav-btn-cart">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/>
+            <line x1="3" y1="6" x2="21" y2="6"/>
+            <path d="M16 10a4 4 0 01-8 0"/>
+          </svg>
+          My Cart
+        </button>
+      </div>
+    </a>
+    <a href="{{ url_for('student_logout') }}">
+      <button class="nav-btn nav-btn-logout">Logout</button>
+    </a>
+    
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <img src="{{ url_for('static', filename='img/bg_cover.png') }}" alt="Campus" class="hero-bg" onerror="this.style.background='linear-gradient(135deg,#02321d,#045c34)'">
+  <div class="hero-overlay"></div>
+  <div class="hero-content">
+    <h1>Borrower's Dashboard</h1>
+    <p>Browse and borrow equipment</p>
+    <div class="hero-stats">
+      <div class="hero-stat">
+        <span class="hero-stat-num">{{ items|length }}</span>
+        <span class="hero-stat-label">Items</span>
+      </div>
+      <div class="hero-stat">
+        <span class="hero-stat-num">{{ items|selectattr("available")|list|length }}</span>
+        <span class="hero-stat-label">Available</span>
+      </div>
+      <div class="hero-stat">
+        <span class="hero-stat-num">{{ items|map(attribute='category')|unique|list|length }}</span>
+        <span class="hero-stat-label">Categories</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="container">
+
+  <!-- TOOLBAR: Search + Filters -->
+  <div class="toolbar">
+      <div class="search-wrap">
+          <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <circle cx="11" cy="11" r="8"/>
+              <path d="m21 21-4.35-4.35"/>
+          </svg>
+          <input type="text" id="liveSearch" class="search-input"
+              placeholder="Search inventory..."
+              value="{{ search_query|default('') }}"
+              oninput="filterItems()">
+      </div>
+      <div class="category-dropdown" id="categoryDropdown">
+          <button class="category-trigger" id="categoryTrigger" onclick="toggleCategoryDropdown()">
+              <span id="categoryLabel">Category</span>
+              <svg id="categoryArrow" class="category-arrow" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="14" height="14">
+                  <path d="M7 10l5 5 5-5z"/>
+              </svg>
+          </button>
+          <div class="category-panel" id="categoryPanel">
+              <!-- Available filter -->
+              <label class="category-check-item category-check-available">
+                  <input type="checkbox" class="cat-checkbox" value="__available__" onchange="handleCheckboxChange()">
+                  <span class="cat-checkmark"></span>
+                  <span class="avail-dot"></span>
+                  Available only
+              </label>
+              <div class="category-divider"></div>
+              <!-- Category checkboxes -->
+              {% set categories = items|map(attribute='category')|unique|list %}
+              {% for cat in categories %}
+              <label class="category-check-item">
+                  <input type="checkbox" class="cat-checkbox" value="{{ cat|lower }}" onchange="handleCheckboxChange()">
+                  <span class="cat-checkmark"></span>
+                  {{ cat }}
+              </label>
+              {% endfor %}
+              <!-- Footer: Clear -->
+              <div class="category-panel-footer">
+                  <button class="cat-clear-btn" onclick="clearAllFilters()">Clear all</button>
+              </div>
+          </div>
+      </div>
+  </div>
+
+  <!-- WARNING BANNER -->
+  <div class="warning-banner" id="warningBanner">
+      <div class="warning-banner-left">
+          <span class="warning-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="18" height="18">
+                  <path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/>
+              </svg>
+          </span>
+          <div class="warning-text">
+              <span class="warning-title">Handle with Care</span>
+              <span class="warning-msg">Please handle all borrowed equipment with care. Damaged or lost items may be subject to penalties.</span>
+          </div>
+      </div>
+      <button class="warning-dismiss" onclick="dismissWarning()" title="Dismiss">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="14" height="14">
+              <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+          </svg>
+      </button>
+  </div>
+
+  <!-- TUTORIAL CARD -->
+  <div class="tutorial-card" id="tutorialCard">
+      <div class="tutorial-header">
+          <div style="display:flex; align-items:center; gap:10px;">
+              <span style="font-size:1.2rem;">💡</span>
+              <strong style="font-size:0.9rem;">How to use the Borrower's Dashboard</strong>
+          </div>
+          <button onclick="toggleTutorial()" id="tutorialToggle" class="tutorial-toggle-btn">
+              Show ▼
+          </button>
+      </div>
+
+      <div id="tutorialContent" style="margin-top:1rem;">
+          <div class="tutorial-steps">
+
+              <div class="tutorial-step">
+                  <div class="tutorial-step-icon">
+                      <span class="ts-icon ts-icon-blue">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                              <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+                          </svg>
+                      </span>
+                  </div>
+                  <div>
+                      <div class="tutorial-step-title">Search & Filter</div>
+                      <div class="tutorial-step-desc">Use the search bar to find equipment by name, serial number, or condition. Click the category buttons to filter by type.</div>
+                  </div>
+              </div>
+
+              <div class="tutorial-step">
+                  <div class="tutorial-step-icon">
+                      <span class="ts-icon ts-icon-orange">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                              <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/>
+                          </svg>
+                      </span>
+                  </div>
+                  <div>
+                      <div class="tutorial-step-title">Borrow an Item</div>
+                      <div class="tutorial-step-desc">Click <strong>Borrow</strong> on any item card to fill out a borrow request form. Your request will go through an approval process before it's confirmed.</div>
+                  </div>
+              </div>
+
+              <div class="tutorial-step">
+                  <div class="tutorial-step-icon">
+                      <span class="ts-icon ts-icon-green">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                              <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/>
+                              <line x1="3" y1="6" x2="21" y2="6"/>
+                              <path d="M16 10a4 4 0 01-8 0"/>
+                          </svg>
+                      </span>
+                  </div>
+                  <div>
+                      <div class="tutorial-step-title">Use the Cart</div>
+                      <div class="tutorial-step-desc">Click the <strong>+Cart</strong> icon on a card to add it to your cart. Go to your cart, located at the top right next to the logout button to borrow multiple items at once using <strong>Borrow All</strong>.</div>
+                  </div>
+              </div>
+
+              <div class="tutorial-step">
+                  <div class="tutorial-step-icon">
+                      <span class="ts-icon ts-icon-purple">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                              <rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/>
+                          </svg>
+                      </span>
+                  </div>
+                  <div>
+                      <div class="tutorial-step-title">Read the Calendar</div>
+                      <div class="tutorial-step-desc">Click <strong>Details</strong> on any item to see its borrowing schedule. 
+                          <span style="display:inline-flex; align-items:center; gap:4px;">
+                              <span style="width:8px;height:8px;border-radius:50%;background:#f59e0b;display:inline-block;"></span> Yellow
+                          </span> means pending request, 
+                          <span style="display:inline-flex; align-items:center; gap:4px;">
+                              <span style="width:8px;height:8px;border-radius:50%;background:#22c55e;display:inline-block;"></span> Green
+                          </span> means approved/borrowed.
+                      </div>
+                  </div>
+              </div>
+
+              <div class="tutorial-step">
+                  <div class="tutorial-step-icon">
+                      <span class="ts-icon ts-icon-teal">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                              <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
+                              <polyline points="14 2 14 8 20 8"/>
+                              <line x1="16" y1="13" x2="8" y2="13"/>
+                              <line x1="16" y1="17" x2="8" y2="17"/>
+                              <polyline points="10 9 9 9 8 9"/>
+                          </svg>
+                      </span>
+                  </div>
+                  <div>
+                      <div class="tutorial-step-title">Check Your Requests</div>
+                      <div class="tutorial-step-desc">Go to <strong>My Requests</strong> from the landing page and enter your student ID to see the status of all your borrow requests.</div>
+                  </div>
+              </div>
+
+              <div class="tutorial-step">
+                  <div class="tutorial-step-icon">
+                      <span class="ts-icon ts-icon-red">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                              <circle cx="12" cy="12" r="10"/>
+                              <polyline points="12 6 12 12 16 14"/>
+                          </svg>
+                      </span>
+                  </div>
+                  <div>
+                      <div class="tutorial-step-title">Return on Time</div>
+                      <div class="tutorial-step-desc">Always return borrowed equipment by the agreed date. Late returns may affect your future borrowing privileges. Check your return date in <strong>My Requests</strong>.</div>
+                  </div>
+              </div>
+
+          </div>
+      </div>
+  </div>
+
+  <!-- GRID -->
+  <div class="grid" id="itemGrid">
+      {% if items %}
+          {% for item in items %}
+          <div class="card"
+              data-name="{{ item.name|lower }}"
+              data-category="{{ item.category|lower }}"
+              data-serial="{{ item.serial|lower }}"
+              data-condition="{{ item.condition|lower }}"
+              data-available="{{ item.available|tojson }}">
+
+              <div class="card-top">
+                  <span class="avail-badge {{ 'yes' if item.available else 'no' }}">
+                      {{ 'Available' if item.available else 'Unavailable today' }}
+                  </span>
+                  <span class="add-to-cart-label">Add to Cart →</span>
+                  <button class="card-cart-icon" onclick="addToCart({{ item.id }}, '{{ item.name }}', '{{ item.category }}', {{ item.available|tojson }})" title="Add to Cart">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                          <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/>
+                          <line x1="3" y1="6" x2="21" y2="6"/>
+                          <path d="M16 10a4 4 0 01-8 0"/>
+                      </svg>
+                  </button>
+              </div>
+
+              <div>
+                  {% if not item.available and item.return_date %}
+                  <span style="font-size:10px; color:rgba(15,14,14,0.6); margin-top:4px; display:block;">
+                      <i>Next Return Date: {{ item.return_date }}</i>
+                  </span>
+                  {% endif %}
+              </div>
+
+              <div class="item-name">{{ item.name }}</div>
+              <div class="item-desc">{{ item.desc or 'No description available.' }}</div>
+              <div class="item-desc" style="font-size:0.75rem; opacity:0.6; margin-top:4px;">
+                  📍 {{ item.office }}
+              </div>
+              <div>
+                  <span class="tag">{{ item.category }}</span>
+              </div>
+
+              <div class="card-footer">
+                  <div style="display:flex;gap:6px;align-items:center">
+                      <button class="card-btn view-btn" onclick="openModal({{ item.id }})">Details</button>
+                      {% if item.condition == 'functional' %}
+                      <button class="card-btn borrow" onclick="window.location.href='/student/borrow?inventory_id={{ item.id }}'">📦 Borrow</button>
+                      {% else %}
+                      <button class="card-btn borrow" disabled title="This item is currently {{ item.condition }} and unavailable for borrowing." >{{item.condition|replace(' ', '-')|title }}</button>
+                      {% endif %}
+                  </div>
+              </div>
+          </div>
+          {% endfor %}
+      {% endif %}
+
+      <div class="empty-state" id="emptyState" style="display:none;">
+          <div class="empty-icon">🔍</div>
+          <h3>No items found</h3>
+          <p>Try adjusting your search or filter</p>
+      </div>
+  </div>
+
+  <!-- PAGINATION -->
+  <div class="pagination-wrap" id="paginationWrap">
+      <button class="page-btn page-prev" id="pagePrev" onclick="changePage(currentPage - 1)">&#8249; Prev</button>
+      <div class="page-numbers" id="pageNumbers"></div>
+      <button class="page-btn page-next" id="pageNext" onclick="changePage(currentPage + 1)">Next &#8250;</button>
+  </div>
+</div>
+
+<!-- DETAIL MODAL -->
+<div class="modal-overlay" id="modalOverlay" onclick="closeModal(event)">
+  <div class="modal" id="modalBox">
+    <div class="modal-header">
+      <div class="modal-icon" id="modalIcon"></div>
+      <div class="modal-header-text">
+        <h3 id="modalName"></h3>
+        <p id="modalStatus"></p>
+      </div>
+    </div>
+    <div class="modal-body">
+      <div class="modal-desc" id="modalDesc"></div>
+      <div class="spec-grid" id="modalSpecs"></div>
+
+      <!-- BORROWING CALENDAR -->
+      <div class="cal-section">
+        <div class="cal-section-title">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+          Borrowing Schedule
+        </div>
+        <div class="cal-legend">
+          <span class="cal-legend-item"><span class="cal-dot pending"></span>Pending Request</span>
+          <span class="cal-legend-item"><span class="cal-dot approved"></span>Approved / Borrowed</span>
+        </div>
+        <div class="cal-nav">
+          <button class="cal-nav-btn" id="calPrev" onclick="shiftMonth(-1)">&#8249;</button>
+          <span class="cal-month-label" id="calMonthLabel"></span>
+          <button class="cal-nav-btn" id="calNext" onclick="shiftMonth(1)">&#8250;</button>
+        </div>
+        <div class="cal-grid" id="calGrid"></div>
+      </div>
+
+      <div class="modal-actions">
+        <button class="modal-btn secondary" onclick="closeModal()">Close</button>
+        <button class="modal-btn primary" id="modalActionBtn"></button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast">
+  <span id="toastIcon">✓</span>
+  <span id="toastMsg"></span>
+</div>
+
+<script>
+  let selectedItem = null;
+  let calViewYear = new Date().getFullYear();
+  let calViewMonth = new Date().getMonth(); // 0-indexed
+  let currentItemBookings = []; // { date: 'YYYY-MM-DD', status: 'pending'|'approved' }
+
+  
+  // Expected format: [{ date: '2025-07-10', status: 'pending' }, ...]
+  const MOCK_BOOKINGS = {
+    // item_id -> array of bookings
+    // Populated dynamically; kept empty here so real data can be injected
+  };
+
+  async function fetchItemBookings(itemId) {
+    // Try to fetch real booking data from the server
+    try {
+      const res = await fetch(`/student/item/${itemId}/bookings`);
+      if (res.ok) {
+        const data = await res.json();
+        return data.bookings; // [{ date, status }]
+      }
+    } catch (_) {}
+    // Fallback: return mock data if present
+    return MOCK_BOOKINGS[itemId] || [];
+  }
+
+  function renderCalendar() {
+    const label = document.getElementById('calMonthLabel');
+    const grid = document.getElementById('calGrid');
+    const monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+    label.textContent = `${monthNames[calViewMonth]} ${calViewYear}`;
+
+    const bookingMap = {};
+    currentItemBookings.forEach(b => { bookingMap[b.date] = b.status; });
+
+    const firstDay = new Date(calViewYear, calViewMonth, 1).getDay(); // 0=Sun
+    const daysInMonth = new Date(calViewYear, calViewMonth + 1, 0).getDate();
+    const today = new Date();
+    const todayStr = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-${String(today.getDate()).padStart(2,'0')}`;
+
+    let html = '';
+    // Day headers
+    ['Su','Mo','Tu','We','Th','Fr','Sa'].forEach(d => {
+      html += `<div class="cal-day-header">${d}</div>`;
+    });
+    // Empty leading cells
+    for (let i = 0; i < firstDay; i++) html += `<div class="cal-cell empty"></div>`;
+    // Day cells
+    for (let d = 1; d <= daysInMonth; d++) {
+      const dateStr = `${calViewYear}-${String(calViewMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+      const status = bookingMap[dateStr];
+      let cls = 'cal-cell';
+      if (dateStr === todayStr) cls += ' today';
+      if (status === 'pending') cls += ' cal-pending';
+      if (status === 'approved') cls += ' cal-approved';
+      const tip = status === 'pending' ? 'Pending request' : status === 'approved' ? 'Approved / Borrowed' : '';
+      html += `<div class="${cls}" title="${tip}">${d}${status ? `<span class="cal-indicator ${status}"></span>` : ''}</div>`;
+    }
+    grid.innerHTML = html;
+  }
+
+  function shiftMonth(dir) {
+    calViewMonth += dir;
+    if (calViewMonth > 11) { calViewMonth = 0; calViewYear++; }
+    if (calViewMonth < 0)  { calViewMonth = 11; calViewYear--; }
+    renderCalendar();
+  }
+
+  async function openModal(itemId) {
+    selectedItem = {{ items|tojson }};
+    selectedItem = selectedItem.find(i => i.id === itemId);
+    if (!selectedItem) return;
+
+    document.getElementById('modalIcon').textContent = '📦';
+    document.getElementById('modalName').textContent = selectedItem.name;
+    document.getElementById('modalStatus').textContent = selectedItem.available ? '● Available for borrowing' : '● Currently unavailable';
+    document.getElementById('modalDesc').textContent = selectedItem.desc || 'No description available.';
+
+    const specs = document.getElementById('modalSpecs');
+    specs.innerHTML = '';
+    const specData = {
+      'Category': selectedItem.category || 'N/A',
+      'Office': selectedItem.office || 'N/A',
+      'Serial No.': selectedItem.serial || 'N/A',
+      'Condition': selectedItem.condition || 'N/A',
+    };
+    Object.entries(specData).forEach(([k, v]) => {
+      const div = document.createElement('div');
+      div.className = 'spec-item';
+      div.innerHTML = `<div class="spec-k">${k}</div><div class="spec-v">${v}</div>`;
+      specs.appendChild(div);
+    });
+
+    const btn = document.getElementById('modalActionBtn');
+    if (selectedItem.available) {
+      btn.textContent = '📦 Request to Borrow';
+      btn.style.opacity = '1';
+      btn.disabled = false;
+      btn.onclick = () => window.location.href = `/student/borrow?inventory_id=${selectedItem.id}`;
+    } else {
+      btn.textContent = '⏳ Unavailable';
+      btn.style.opacity = '0.5';
+      btn.disabled = true;
+      btn.onclick = null;
+    }
+
+    // Reset calendar to current month
+    const now = new Date();
+    calViewYear = now.getFullYear();
+    calViewMonth = now.getMonth();
+
+    // Fetch bookings then render
+    currentItemBookings = await fetchItemBookings(itemId);
+    renderCalendar();
+
+    document.getElementById('modalOverlay').classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeModal(e) {
+    if (e && e.target !== document.getElementById('modalOverlay')) return;
+    document.getElementById('modalOverlay').classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') closeModal();
+  });
+</script>
+
+<script>
+  // ── CART LOGIC ──
+  function getCart() {
+    try { return JSON.parse(localStorage.getItem('csu_cart') || '[]'); } catch { return []; }
+  }
+  function saveCart(cart) {
+    localStorage.setItem('csu_cart', JSON.stringify(cart));
+    updateCartBadge();
+  }
+  function updateCartBadge() {
+    // badge display removed
+  }
+  function addToCart(id, name, category, available) {
+    const cart = getCart();
+    if (cart.find(i => i.id === id)) {
+      document.getElementById('toastIcon').textContent = '⚠️';
+      document.getElementById('toastMsg').textContent = 'Already in cart!';
+      const t = document.getElementById('toast');
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 2500);
+      return;
+    }
+    cart.push({ id, name, category, available });
+    saveCart(cart);
+    document.getElementById('toastIcon').textContent = '🛒';
+    document.getElementById('toastMsg').textContent = name + ' added to cart!';
+    const t = document.getElementById('toast');
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2500);
+  }
+  updateCartBadge();
+</script>
+<script>
+    // ── PAGINATION + MULTI-SELECT CATEGORY FILTER ──
+
+    const ITEMS_PER_PAGE = 18;
+    let currentPage = 1;
+    let matchedCards = [];  // cards passing current filter
+
+    function getCheckedValues() {
+        return [...document.querySelectorAll('.cat-checkbox:checked')].map(cb => cb.value);
+    }
+
+    // Returns true if a card passes the current search + category filters
+    function cardMatches(card) {
+        const search = document.getElementById('liveSearch').value.toLowerCase();
+        const checked = getCheckedValues();
+        const availableOnly = checked.includes('__available__');
+        const categoryFilters = checked.filter(v => v !== '__available__');
+
+        const name      = card.dataset.name      || '';
+        const category  = card.dataset.category  || '';
+        const serial    = card.dataset.serial    || '';
+        const condition = card.dataset.condition || '';
+        const isAvail   = card.dataset.available === 'true';
+
+        const matchesSearch = !search ||
+            name.includes(search) ||
+            category.includes(search) ||
+            serial.includes(search) ||
+            condition.includes(search);
+
+        const matchesCategory =
+            checked.length === 0 ||
+            (availableOnly && categoryFilters.length === 0
+                ? isAvail
+                : (categoryFilters.length === 0 || categoryFilters.includes(category)) &&
+                  (!availableOnly || isAvail));
+
+        return matchesSearch && matchesCategory;
+    }
+
+    function filterItems() {
+        const allCards = [...document.querySelectorAll('.card')];
+
+        // Separate matching from non-matching
+        matchedCards = allCards.filter(c => cardMatches(c));
+        const hidden  = allCards.filter(c => !cardMatches(c));
+
+        // Hide non-matching cards immediately
+        hidden.forEach(c => c.style.display = 'none');
+
+        // Reset to page 1 whenever filters change
+        currentPage = 1;
+        renderPage();
+        updateStats();
+        updateTriggerLabel();
+    }
+
+    function renderPage() {
+        const totalPages = Math.max(1, Math.ceil(matchedCards.length / ITEMS_PER_PAGE));
+        currentPage = Math.min(Math.max(1, currentPage), totalPages);
+
+        const start = (currentPage - 1) * ITEMS_PER_PAGE;
+        const end   = start + ITEMS_PER_PAGE;
+
+        // Show only the current page's slice; hide the rest
+        matchedCards.forEach((card, i) => {
+            card.style.display = (i >= start && i < end) ? '' : 'none';
+        });
+
+        // Empty state
+        document.getElementById('emptyState').style.display =
+            matchedCards.length === 0 ? 'block' : 'none';
+
+        renderPaginationControls(totalPages);
+    }
+
+    function renderPaginationControls(totalPages) {
+        const wrap    = document.getElementById('paginationWrap');
+        const prevBtn = document.getElementById('pagePrev');
+        const nextBtn = document.getElementById('pageNext');
+        const numbersEl = document.getElementById('pageNumbers');
+
+        // Hide pagination entirely if everything fits on one page
+        wrap.style.display = totalPages <= 1 ? 'none' : 'flex';
+
+        prevBtn.disabled = currentPage === 1;
+        nextBtn.disabled = currentPage === totalPages;
+
+        // Build page number buttons with smart ellipsis
+        numbersEl.innerHTML = '';
+        const pages = getPageRange(currentPage, totalPages);
+        pages.forEach(p => {
+            if (p === '…') {
+                const span = document.createElement('span');
+                span.className = 'page-ellipsis';
+                span.textContent = '…';
+                numbersEl.appendChild(span);
+            } else {
+                const btn = document.createElement('button');
+                btn.className = 'page-num' + (p === currentPage ? ' active' : '');
+                btn.textContent = p;
+                btn.onclick = () => changePage(p);
+                numbersEl.appendChild(btn);
+            }
+        });
+    }
+
+    // Produces e.g. [1, 2, 3, '…', 10] or [1, '…', 4, 5, 6, '…', 10]
+    function getPageRange(current, total) {
+        if (total <= 7) return Array.from({ length: total }, (_, i) => i + 1);
+        const pages = [];
+        if (current <= 4) {
+            pages.push(1, 2, 3, 4, 5, '…', total);
+        } else if (current >= total - 3) {
+            pages.push(1, '…', total - 4, total - 3, total - 2, total - 1, total);
+        } else {
+            pages.push(1, '…', current - 1, current, current + 1, '…', total);
+        }
+        return pages;
+    }
+
+    function changePage(p) {
+        const totalPages = Math.ceil(matchedCards.length / ITEMS_PER_PAGE);
+        if (p < 1 || p > totalPages) return;
+        currentPage = p;
+        renderPage();
+        // Scroll smoothly back to the top of the grid
+        document.getElementById('itemGrid').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    // ── LABEL / STATS ──
+
+    function updateTriggerLabel() {
+        const checked = getCheckedValues();
+        const label = document.getElementById('categoryLabel');
+        if (checked.length === 0) {
+            label.textContent = 'Category';
+            document.getElementById('categoryTrigger').classList.remove('has-filter');
+        } else if (checked.length === 1 && checked[0] === '__available__') {
+            label.innerHTML = '<span class="trigger-avail-dot"></span> Available';
+            document.getElementById('categoryTrigger').classList.add('has-filter');
+        } else {
+            const catCount = checked.filter(v => v !== '__available__').length;
+            const hasAvail = checked.includes('__available__');
+            const parts = [];
+            if (catCount > 0) parts.push(catCount === 1
+                ? checked.find(v => v !== '__available__')
+                : `${catCount} categories`);
+            if (hasAvail) parts.push('Available');
+            label.textContent = parts.join(' · ');
+            document.getElementById('categoryTrigger').classList.add('has-filter');
+        }
+    }
+
+    function updateStats() {
+        const availableCount   = matchedCards.filter(c => c.dataset.available === 'true').length;
+        const uniqueCategories = new Set(matchedCards.map(c => c.dataset.category)).size;
+        document.querySelectorAll('.hero-stat-num')[0].textContent = matchedCards.length;
+        document.querySelectorAll('.hero-stat-num')[1].textContent = availableCount;
+        document.querySelectorAll('.hero-stat-num')[2].textContent = uniqueCategories;
+    }
+
+    // ── CHECKBOX HELPERS ──
+
+    function handleCheckboxChange() { filterItems(); }
+
+    function clearAllFilters() {
+        document.querySelectorAll('.cat-checkbox').forEach(cb => cb.checked = false);
+        filterItems();
+    }
+
+    // ── DROPDOWN TOGGLE ──
+
+    function toggleCategoryDropdown() {
+        const panel = document.getElementById('categoryPanel');
+        const arrow = document.getElementById('categoryArrow');
+        const isOpen = panel.classList.contains('open');
+        panel.classList.toggle('open', !isOpen);
+        arrow.classList.toggle('rotated', !isOpen);
+    }
+
+    document.addEventListener('click', function(e) {
+        const dropdown = document.getElementById('categoryDropdown');
+        if (!dropdown.contains(e.target)) {
+            document.getElementById('categoryPanel').classList.remove('open');
+            document.getElementById('categoryArrow').classList.remove('rotated');
+        }
+    });
+
+    // ── TUTORIAL ──
+
+    function toggleTutorial() {
+        const content = document.getElementById('tutorialContent');
+        const btn = document.getElementById('tutorialToggle');
+        const isVisible = content.style.display !== 'none';
+        content.style.display = isVisible ? 'none' : 'block';
+        btn.textContent = isVisible ? 'Show ▼' : 'Hide ▲';
+        localStorage.setItem('tutorialHidden', isVisible ? 'true' : 'false');
+    }
+
+    // Restore preference; default: visible → button says "Hide ▲"
+    if (localStorage.getItem('tutorialHidden') === 'true') {
+        document.getElementById('tutorialContent').style.display = 'none';
+        document.getElementById('tutorialToggle').textContent = 'Show ▼';
+    } else {
+        document.getElementById('tutorialContent').style.display = 'block';
+        document.getElementById('tutorialToggle').textContent = 'Hide ▲';
+    }
+
+    // ── INIT ──
+    filterItems();
+
+    // ── WARNING BANNER DISMISS ──
+    // Clear any previously stored dismiss so the banner always shows on load
+    sessionStorage.removeItem('warningDismissed');
+
+    function dismissWarning() {
+        const banner = document.getElementById('warningBanner');
+        banner.classList.add('warning-hiding');
+        setTimeout(() => banner.style.display = 'none', 300);
+    }
+</script>
+
+</body>
+</html>
