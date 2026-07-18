@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>CReATe — Borrow Request</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+<link rel="icon" type="image/png" href="{{ url_for('static', filename='img/CSU-logo.png') }}">
+
+<style>
+
+body{
+    background:#f8f9fa;
+    font-family:'Sora', sans-serif;
+    margin:0;
+}
+
+.container{
+    max-width:720px;
+    margin:2rem auto;
+    padding:1rem;
+}
+
+.card{
+    background:#fff;
+    padding:2rem;
+    border-radius:14px;
+    box-shadow:0 10px 24px rgba(0,0,0,0.08);
+}
+
+.card h1{
+    margin-top:0;
+}
+
+.form-group{
+    margin-bottom:1rem;
+    display:flex;
+    flex-direction:column;
+}
+
+.form-group label{
+    font-weight:500;
+    margin-bottom:0.25rem;
+}
+
+input, textarea, select{
+    padding:0.55rem;
+    border-radius:6px;
+    border:1px solid #dcdcdc;
+    font-size:0.95rem;
+    background:#fff;
+}
+
+textarea{
+    resize:vertical;
+}
+
+.submit-btn{
+    background:#045c34;
+    color:#fff;
+    border:none;
+    padding:0.75rem 1.5rem;
+    border-radius:6px;
+    cursor:pointer;
+    font-weight:600;
+}
+
+.submit-btn:hover{
+    background:#03492a;
+}
+
+.flash{
+    padding:0.9rem;
+    border-radius:8px;
+    margin-bottom:1rem;
+}
+
+.flash-success{
+    background:#d4f0e4;
+    color:#045c34;
+}
+
+.flash-danger{
+    background:#f8d7da;
+    color:#842029;
+}
+
+.item-chip{
+    display:flex;
+    align-items:center;
+    gap:1rem;
+    margin-bottom:1.2rem;
+    padding:0.9rem 1rem;
+    background:#f1f3f5;
+    border-radius:8px;
+}
+
+.item-chip-icon{
+    font-size:1.6rem;
+}
+
+.student-box{
+    background:#f8f9fa;
+    border-radius:8px;
+    padding:0.9rem 1rem;
+    margin-bottom:1.2rem;
+}
+
+.info-line{
+    font-size:0.9rem;
+    color:#555;
+}
+
+</style>
+</head>
+
+
+<body>
+
+<div class="container">
+
+<!-- Flash Messages -->
+{% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        {% for category, message in messages %}
+        <div class="flash flash-{{ category }}">
+            {{ message }}
+        </div>
+        {% endfor %}
+    {% endif %}
+{% endwith %}
+
+<div class="card">
+
+<h1>Borrow Request</h1>
+
+<p style="color:#666;font-size:0.9rem;">
+Submit a request to borrow this item.  
+Your request will be reviewed by the equipment approver assigned to the item's office.
+</p>
+
+
+<!-- INVENTORY ITEM -->
+{% if inventory %}
+<div class="item-chip">
+
+<div class="item-chip-icon">📦</div>
+
+<div>
+<div><strong>{{ inventory.inventory_nm }}</strong></div>
+
+<div class="info-line">
+Serial: {{ inventory.serial_number }}
+</div>
+
+<div class="info-line">
+Office: {{ inventory.office.office_nm }}
+</div>
+
+<div class="info-line">
+Condition: {{ inventory.inventory_condition }}
+</div>
+
+</div>
+</div>
+{% else %}
+
+<div class="flash flash-danger">
+No inventory item selected.
+</div>
+
+{% endif %}
+
+
+
+<!-- STUDENT INFO -->
+{% if student %}
+<div class="student-box">
+
+<strong>Borrower:</strong> {{ student.name }} <br>
+<strong>ID:</strong> {{ student.number }} <br>
+<strong>Other info:</strong> {{ student.course }} {{ student.year }}
+
+</div>
+{% endif %}
+
+
+
+<!-- BORROW FORM -->
+<form method="POST">
+
+{{ form.hidden_tag() }}
+
+<!-- Hidden Inventory ID -->
+{{ form.inventory_id(type="hidden") }}
+
+<div class="form-group">
+
+<label for="remarks">Remarks (Optional)</label>
+
+{{ form.remarks(
+    id="remarks",
+    class="form-control",
+    placeholder="Purpose of borrowing or additional notes"
+) }}
+
+{% if form.remarks.errors %}
+<small style="color:red;">
+{{ form.remarks.errors[0] }}
+</small>
+{% endif %}
+
+</div>
+<div class="form-group">
+    <label>Date to Borrow</label>
+    {{ form.borrow_date(class="form-control") }}
+</div>
+
+<div class="form-group">
+    <label>Expected Return Date</label>
+    {{ form.return_date(class="form-control") }}
+</div>
+<div class="form-group">
+    <label for="faculty_incharge">Faculty In Charge(Faculty that issued the equipment)</label>
+    {{ form.faculty_incharge(class="form-control", placeholder="Enter the name of the faculty in charge") }}
+</div>
+<div class="form-group">
+    <label>Borrower's Contact Number</label>
+    <input type="text" name="contact_number" maxlength="11" 
+        placeholder="09XXXXXXXXX" required
+        oninput="this.value=this.value.replace(/[^0-9]/g,'')">
+</div>
+
+
+<button type="submit" class="submit-btn">
+{{ form.submit.label.text }}
+</button>
+
+</form>
+
+</div>
+
+</div>
+
+</body>
+</html>
