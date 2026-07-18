@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Borrow All — CReATe CSU</title>
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='student-dashboard.css') }}">
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='img/CSU-logo.png') }}">
+</head>
+<body>
+
+<nav>
+    <div class="nav-left">
+        <img src="{{ url_for('static', filename='img/CSU-logo.png') }}" alt="CSU Logo" class="nav-logo-img">
+        <div class="nav-title">
+            Center for Resource Assessment, Analytics and Emerging Technologies
+            <small>Caraga State University</small>
+        </div>
+    </div>
+    <div class="nav-user">
+        <span style="font-size:0.78rem">Hello, {{ student.name }}</span>
+        <a href="{{ url_for('student_logout') }}"><button class="nav-btn nav-btn-logout">Logout</button></a>
+    </div>
+</nav>
+
+<div style="max-width:620px; margin:2.5rem auto; padding:0 1.5rem;">
+
+    <h2 style="font-size:1.4rem; font-weight:700; margin-bottom:0.25rem;">Borrow All Items</h2>
+    <p style="color:var(--muted); font-size:0.83rem; margin-bottom:1.5rem;">
+        Fill in the details below — they will apply to all items in your cart.
+    </p>
+
+    <!-- Items summary -->
+    <div style="background:var(--surface); border:1.5px solid var(--border); border-radius:var(--radius); padding:1rem 1.25rem; margin-bottom:1.5rem;">
+        <p style="font-size:0.72rem; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; color:var(--muted); margin-bottom:0.75rem;">
+            Items to Borrow ({{ inventories|length }})
+        </p>
+        {% for inv in inventories %}
+        <div style="display:flex; align-items:center; gap:10px; padding:6px 0; border-bottom:1px solid var(--border);">
+            <span style="font-size:1rem;">📦</span>
+            <div>
+                <div style="font-weight:600; font-size:0.85rem;">{{ inv.inventory_nm }}</div>
+                <div style="font-size:0.72rem; color:var(--muted);">{{ inv.office.office_nm if inv.office else 'N/A' }}</div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Borrow Form -->
+    <form method="post" action="{{ url_for('student_borrow_bulk') }}" style="background:var(--surface); border:1.5px solid var(--border); border-radius:var(--radius); padding:1.5rem; box-shadow:var(--shadow);">
+
+        <!-- Hidden inventory IDs -->
+        {% for inv in inventories %}
+        <input type="hidden" name="inventory_ids" value="{{ inv.inventory_id }}">
+        {% endfor %}
+
+        <div style="margin-bottom:1rem;">
+            <label style="font-size:0.78rem; font-weight:600; color:var(--muted); display:block; margin-bottom:6px;">Faculty In Charge</label>
+            <input type="text" name="faculty_incharge" required placeholder="Enter faculty in charge name"
+                style="width:100%; padding:0.7rem 1rem; border-radius:9px; border:1.5px solid var(--border); font-family:'Sora',sans-serif; font-size:0.85rem; outline:none;">
+        </div>
+
+        <div style="margin-bottom:1rem;">
+            <label style="font-size:0.78rem; font-weight:600; color:var(--muted); display:block; margin-bottom:6px;">Date to Borrow</label>
+            <input type="date" name="borrow_date" required
+                style="width:100%; padding:0.7rem 1rem; border-radius:9px; border:1.5px solid var(--border); font-family:'Sora',sans-serif; font-size:0.85rem; outline:none;">
+        </div>
+
+        <div style="margin-bottom:1rem;">
+            <label style="font-size:0.78rem; font-weight:600; color:var(--muted); display:block; margin-bottom:6px;">Expected Return Date</label>
+            <input type="date" name="return_date" required
+                style="width:100%; padding:0.7rem 1rem; border-radius:9px; border:1.5px solid var(--border); font-family:'Sora',sans-serif; font-size:0.85rem; outline:none;">
+        </div>
+
+        <div style="margin-bottom:1.5rem;">
+            <label style="font-size:0.78rem; font-weight:600; color:var(--muted); display:block; margin-bottom:6px;">Remarks <span style="font-weight:400;">(optional)</span></label>
+            <textarea name="remarks" rows="3" placeholder="Any additional notes..."
+                style="width:100%; padding:0.7rem 1rem; border-radius:9px; border:1.5px solid var(--border); font-family:'Sora',sans-serif; font-size:0.85rem; outline:none; resize:none;"></textarea>
+        </div>
+        <div class="form-group">
+            <label>Borrower's Contact Number</label>
+            <input type="text" name="contact_number" maxlength="11" 
+                placeholder="09XXXXXXXXX" required
+                oninput="this.value=this.value.replace(/[^0-9]/g,'')">
+        </div>
+
+        <div style="display:flex; gap:10px; justify-content:flex-end;">
+            <a href="{{ url_for('student_cart') }}"
+                style="padding:9px 18px; border-radius:9px; border:1.5px solid var(--border); background:var(--surface); color:var(--text); font-family:'Sora',sans-serif; font-size:0.78rem; font-weight:600; text-decoration:none; display:inline-flex; align-items:center;">
+                ← Back to Cart
+            </a>
+            <button type="submit"
+                style="padding:9px 20px; border-radius:9px; border:none; background:var(--accent); color:#fff; font-family:'Sora',sans-serif; font-size:0.78rem; font-weight:700; cursor:pointer;">
+                📦 Submit All Requests
+            </button>
+        </div>
+    </form>
+</div>
+</body>
+</html>
