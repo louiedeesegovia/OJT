@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Student Information</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='landing.css') }}">
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='img/CSU-logo.png') }}">
+</head>
+<body>
+     <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+            <div class="flash flash-{{ category }}">
+                {{ message }}
+            </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <div class="logo"></div>
+
+    <div class="Title">
+        <h1>Borrower's Information</h1>
+    </div>
+
+    <div class="container">
+        <form method="POST" action="{{ url_for('student_information') }}">
+            {{ login_form.hidden_tag() }}
+
+            <!-- User Type Dropdown -->
+            <div class="input-group">
+                <select id="userType" name="user_type" onchange="toggleForm()" class="form-control">
+                    <option value="student">I am a Student</option>
+                    <option value="faculty">I am a Faculty</option>
+                </select>
+            </div>
+
+            <!-- Student Fields -->
+            <div id="studentFields">
+                <div class="input-group">
+                    {{ login_form.id_number(class="form-control", placeholder="Student ID (e.g. 221-00123)", id="studentId") }}
+                </div>
+                <div class="input-group">
+                    {{ login_form.course(class="form-control", placeholder="Course") }}
+                </div>
+                <div class="input-group">
+                    {{ login_form.year(class="form-control", placeholder="Year") }}
+                </div>
+                <div class="input-group">
+                    {{ login_form.password(class="form-control", placeholder="Password") }}
+                </div>
+            </div>
+
+            <!-- Faculty Fields -->
+            <div id="facultyFields" style="display:none;">
+                <div class="input-group">
+                    <input type="text" id="facultyUsername" class="form-control"
+                        placeholder="Enter your admin username"
+                        oninput="document.getElementById('studentId').value = this.value">
+                </div>
+                <div class="input-group">
+                    <input type="password" id="facultyPassword" name="faculty_password" class="form-control"
+                        placeholder="Enter your password">
+                </div>
+                <p style="font-size:0.75rem; opacity:0.6; margin-top:-8px; margin-bottom:8px; text-align:center;">
+                   Enter Credentials
+                </p>
+            </div>
+
+            {{ login_form.submit(class="btn login-btn") }}
+        </form>
+
+        <div class="link-group">
+            <div class="back-link">
+                <a href="{{ url_for('index') }}">← Back to Landing page</a>
+            </div>
+            <div class="back-link">
+                <a href="{{ url_for('student_requests') }}">View My Requests →</a>
+            </div>
+        </div>
+        <div class="back-link">
+            <a href="{{ url_for('student_register') }}">Register(Students) →</a>
+        </div>
+    </div>
+
+<script>
+    function toggleForm() {
+        const type = document.getElementById('userType').value;
+        const studentFields = document.getElementById('studentFields');
+        const facultyFields = document.getElementById('facultyFields');
+
+        if (type === 'faculty') {
+            studentFields.style.display = 'none';
+            facultyFields.style.display = 'block';
+
+            // Remove required from student fields
+            studentFields.querySelectorAll('input').forEach(i => i.required = false);
+            document.getElementById('facultyUsername').required = true;
+        } else {
+            studentFields.style.display = 'block';
+            facultyFields.style.display = 'none';
+
+            // Restore required on student fields
+            studentFields.querySelectorAll('input').forEach(i => i.required = true);
+            document.getElementById('facultyUsername').required = false;
+        }
+    }
+
+    // Run on page load
+    toggleForm();
+</script>
+
+</body>
+</html>
