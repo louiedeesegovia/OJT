@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Verify Code</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='landing.css') }}">
+</head>
+<body>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+            <div class="flash flash-{{ category }}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <div class="logo"></div>
+    <div class="Title"><h1>Enter Verification Code</h1></div>
+
+    <div class="container">
+        <p>
+            {% set pending = session.get('pending_verification', {}) %}
+            {% if pending.get('email') %}
+                A 6-digit code was sent to <strong>{{ pending.get('email') }}</strong>.
+            {% else %}
+                A 6-digit verification code was sent to your email.
+            {% endif %}
+        </p>
+
+        <form method="POST" action="{{ url_for('verify_otp') }}">
+            <div class="input-group">
+                <input name="otp" type="text" inputmode="numeric" pattern="\d{6}" maxlength="6" required
+                       class="form-control" placeholder="Enter 6-digit code">
+            </div>
+            <div class="input-group">
+                <button type="submit" class="btn login-btn">Verify</button>
+            </div>
+        </form>
+
+        <form method="POST" action="{{ url_for('resend_otp') }}" style="margin-top:0.75rem">
+            <button type="submit" class="action-btn">Resend code</button>
+        </form>
+
+        <p id="countdown" style="margin-top:0.5rem; opacity:0.8"></p>
+
+        <div class="link-group" style="margin-top:1rem">
+            <a href="{{ url_for('student_information') }}"><button class="action-btn">← Back</button></a>
+        </div>
+    </div>
+
+<script>
+    (function(){
+        const pending = {{ session.get('pending_verification', {}) | tojson }};
+        const createdAt = pending.created_at || 0;
+        const expiry = createdAt + 600; // 10 minutes
+        const el = document.getElementById('countdown');
+        function update(){
+            const now = Math.floor(Date.now()/1000);
+            const secs = Math.max(0, expiry - now);
+            if(!el) return;
+            el.textContent = secs > 0 ? ('Expires in ' + secs + 's') : 'Code expired';
+            if(secs > 0) setTimeout(update, 1000);
+        }
+        update();
+    })();
+</script>
+</body>
+</html>
