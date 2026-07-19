@@ -1,0 +1,1037 @@
+/* =========================================
+   DASHBOARD GLOBAL STYLES
+   ========================================= */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+}
+
+body {
+    height: 100vh;
+    display: flex; /* Puts sidebar and main content side-by-side */
+    background:url("../static/img/bg_cover2.png") no-repeat center center/cover;
+    background-attachment: fixed;
+    color: white;
+    overflow: hidden; /* Prevents the whole page from scrolling, only the main content will scroll */
+}
+
+/* Darker overlay for the dashboarad so the cards pop */
+.dashboard-overlay {
+    background: rgba(0, 0, 0, 0.2);
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: -1;
+}
+
+/* =========================================
+   SIDEBAR STYLES
+   ========================================= */
+.sidebar {
+    width: 260px;
+    height: 100vh;
+    position: fixed; /* fixes sidebar in place */
+    top: 0;
+    left: 0;
+    background: rgb(0, 41, 17);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    border-right: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    flex-direction: column;
+    padding: 30px 20px;
+    overflow-y: auto; /* sidebar scrolls independently if needed */
+    z-index: 100;
+}
+
+.sidebar-header {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 40px;
+    padding-left: 10px;
+}
+
+.sidebar-header i {
+    font-size: 24px;
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.sidebar-header h2 {
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.nav-links {
+    list-style: none;
+    flex: 1; /* Pushes the logout button to the bottom */
+}
+
+.nav-links li {
+    margin-bottom: 10px;
+}
+
+.nav-links a {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    text-decoration: none;
+    color: rgba(255, 255, 255, 0.7);
+    padding: 12px 15px;
+    border-radius: 8px;
+    transition: 0.3s;
+}
+
+.nav-links a:hover, .nav-links a.active {
+    background: rgba(255, 255, 255, 0.15);
+    color: white;
+}
+
+.nav-links li a {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 16px;
+    border-radius: 6px;
+    color: rgba(255, 255, 255, 0.7);
+    text-decoration: none;
+    transition: all 0.2s ease;
+    border-left: 3px solid transparent;
+}
+
+.nav-links li a:hover {
+    background: rgba(255, 255, 255, 0.08);
+    color: white;
+    border-left: 3px solid #4ade80;
+}
+
+.nav-links li a.active {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    border-left: 3px solid #4ade80;
+    font-weight: 600;
+}
+
+.logout a {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    text-decoration: none;
+    color: rgba(255, 255, 255, 0.7);
+    padding: 12px 15px;
+    transition: 0.3s;
+}
+
+.logout a:hover {
+    color: white;
+}
+
+/* =========================================
+   MAIN CONTENT STYLES
+   ========================================= */
+.main {
+    margin-left: 260px; /* offset by sidebar width */
+    height: 100vh;
+    overflow-y: auto; /* only main content scrolls */
+    flex: 1;
+}
+
+.main-content {
+    flex: 1;
+    padding: 40px;
+    
+}
+
+/* Top Stats Cards */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 25px;
+    margin-bottom: 30px;
+}
+
+.stat-card {
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    padding: 25px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+}
+
+.stat-info p {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 14px;
+    margin-bottom: 8px;
+}
+
+.stat-info h3 {
+    font-size: 28px;
+}
+
+.stat-card i {
+    font-size: 24px;
+    color: rgba(255, 255, 255, 0.5);
+}
+
+/* Table Area */
+.table-container {
+    background: rgba(0, 41, 17, 0.682);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    padding: 25px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+    overflow: hidden; /* keeps rounded corners when inner div scrolls */
+}
+
+.table-container div::-webkit-scrollbar {
+    width: 6px;
+}
+
+.table-container div::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+}
+
+.table-container div::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 10px;
+}
+
+.table-container div::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.4);
+}
+
+.table-container h2 {
+    margin-bottom: 25px;
+    font-size: 20px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+thead th {
+    position: sticky;
+    top: 0;
+    background: rgba(0, 41, 17, 0.9);
+    z-index: 1;
+}
+
+th, td {
+    padding: 15px;
+    text-align: left;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    font-size: 14px;
+}
+
+th {
+    color: rgba(255, 255, 255, 0.7);
+    font-weight: normal;
+}
+
+/* Badges & Buttons */
+.badge.pending {
+    border: 1px solid #bda827;
+    background: rgba(189, 168, 39, 0.2);
+    color: #e6d35c;
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+}
+
+.action-btn {
+    border: none;
+    padding: 6px 15px;
+    border-radius: 6px;
+    font-size: 13px;
+    cursor: pointer;
+    transition: 0.3s;
+    margin-right: 5px;
+}
+
+.action-btn.approve {
+    border: 1px solid rgba(40, 167, 69, 0.6);
+    background: rgba(40, 167, 69, 0.2);
+    color: #4ade80;
+}
+
+.action-btn.approve:hover {
+    background: rgba(40, 167, 69, 0.4);
+}
+
+.action-btn.reject {
+    border: 1px solid rgba(220, 53, 69, 0.6);
+    background: rgba(220, 53, 69, 0.2);
+    color: #f87171;
+}
+
+.action-btn.reject:hover {
+    background: rgba(220, 53, 69, 0.4);
+}
+
+/* =========================================
+   MANAGE INVENTORY STYLES
+   ========================================= */
+
+/* Page Header */
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+}
+
+.page-header h2 {
+    font-size: 24px;
+    font-weight: bold;
+}
+
+/* Controls (Search & Filter) */
+.controls-container {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 25px;
+}
+
+.search-box {
+    flex: 1; /* Takes up remaining space */
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.search-box i {
+    position: absolute;
+    left: 15px;
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.search-box input, .filter-dropdown {
+    width: 100%;
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    padding: 12px 15px 12px 40px; /* Left padding makes room for the icon */
+    border-radius: 8px;
+    color: white;
+    font-size: 14px;
+    outline: none;
+    transition: 0.3s;
+}
+
+.search-box input:focus, .filter-dropdown:focus {
+    border-color: rgba(0, 123, 255, 0.8);
+    background: rgba(255, 255, 255, 0.15);
+}
+
+.search-box input::placeholder {
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.filter-dropdown {
+    width: 200px;
+    padding: 12px 15px;
+    cursor: pointer;
+}
+
+/* Dropdown options styling (Note: options styling is limited in pure CSS, but we make the background dark so text is visible) */
+.filter-dropdown option {
+    background: #222;
+    color: white;
+}
+
+/* Fix month picker visibility */
+input[type="month"] {
+    color-scheme: dark;
+    color: white;
+    width: auto;
+    min-width: 150px;
+}
+
+input[type="month"]::-webkit-calendar-picker-indicator {
+    filter: invert(1);
+    cursor: pointer;
+}
+
+/* Fix date-filters search-box overflow cutting off picker */
+.date-filters .search-box {
+    overflow: visible;
+}
+
+/* Buttons and Badges */
+.action-btn.add-btn {
+    background: #05641f;
+    color: white;
+    padding: 10px 20px;
+    font-size: 14px;
+    border: none;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 4px 15px rgba(0, 123, 255, 0.3);
+}
+
+.action-btn.add-btn:hover {
+    background: #0056b3;
+}
+
+.icon-btn {
+    background: transparent;
+    border: none;
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 16px;
+    cursor: pointer;
+    padding: 5px;
+    margin-right: 10px;
+    transition: 0.3s;
+}
+
+.icon-btn.edit-btn:hover {
+    color: #007BFF; /* Blue hover for edit */
+}
+
+.icon-btn.delete-btn:hover {
+    color: #dc3545; /* Red hover for delete */
+}
+
+.badge.in-stock {
+    border: 1px solid rgba(235, 228, 9, 0.6);
+    background: rgb(191, 197, 0);
+    color: #045a23;
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+}
+
+.badge.out-of-stock {
+    border: 1px solid rgba(220, 53, 69, 0.6);
+    background: rgba(220, 53, 69, 0.2);
+    color: #f87171;
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+}
+
+/* =========================================
+   MANAGE REQUESTS SPECIFIC STYLES
+   ========================================= */
+
+/* New badge colors for Approved and Rejected statuses */
+.badge.approved {
+    border: 1px solid rgba(40, 167, 69, 0.6);
+    background: rgba(40, 167, 69, 0.2);
+    color: #4ade80;
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+}
+
+.badge.rejected {
+    border: 1px solid rgba(220, 53, 69, 0.6);
+    background: rgba(220, 53, 69, 0.2);
+    color: #f87171;
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+}
+
+/* =========================================
+   BORROWED ITEMS SPECIFIC STYLES
+   ========================================= */
+
+/* Badges */
+.badge.active-borrow {
+    border: 1px solid rgba(13, 110, 253, 0.6);
+    background: rgba(13, 110, 253, 0.2);
+    color: #6ea8fe; /* Light Blue */
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+}
+
+.badge.overdue {
+    border: 1px solid rgba(220, 53, 69, 0.8);
+    background: rgba(220, 53, 69, 0.3);
+    color: #ff8787; /* Bright Red */
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: bold;
+    box-shadow: 0 0 8px rgba(220, 53, 69, 0.4); /* Slight glow for urgency */
+}
+
+.badge.returned {
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    background: rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.7); /* Muted Gray/White */
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+}
+
+/* Specific Buttons */
+.action-btn.return-btn {
+    border: 1px solid rgba(40, 167, 69, 0.6);
+    background: rgba(40, 167, 69, 0.2);
+    color: #4ade80;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.action-btn.return-btn:hover {
+    background: rgba(40, 167, 69, 0.4);
+}
+
+.icon-btn.remind-btn {
+    color: #ffc107; /* Warning Yellow */
+}
+
+.icon-btn.remind-btn:hover {
+    color: #ffda6a;
+    transform: scale(1.1);
+}
+
+/* =========================================
+   REPORTS SPECIFIC STYLES
+   ========================================= */
+
+/* Export & Generate Buttons */
+.action-btn.export-btn {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    padding: 10px 20px;
+    font-size: 14px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.action-btn.export-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.action-btn.generate-btn {
+    background: #007BFF;
+    color: white;
+    padding: 12px 25px;
+    border: none;
+    font-size: 14px;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0, 123, 255, 0.3);
+}
+
+.action-btn.generate-btn:hover {
+    background: #0056b3;
+}
+
+/* Date Filters */
+.date-filters .search-box {
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+    overflow: hidden; /* Keeps the glass effect contained */
+}
+
+/* To hide the default browser styling on the date picker icon (optional but looks cleaner) */
+input[type="date"]::-webkit-calendar-picker-indicator {
+    filter: invert(1); /* Makes the calendar icon white */
+    cursor: pointer;
+}
+
+/* CSS Bar Chart */
+.chart-container {
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    padding: 25px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+    margin-top: 30px;
+}
+
+.chart-container h3 {
+    margin-bottom: 25px;
+    font-size: 18px;
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.css-chart {
+    display: flex;
+    justify-content: space-around;
+    align-items: flex-end; /* Aligns bars to the bottom */
+    height: 250px;
+    padding-bottom: 30px; /* Space for labels */
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    position: relative;
+}
+
+.bar-group {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+    height: 100%;
+    width: 40px;
+}
+
+.bar {
+    width: 100%;
+    background: linear-gradient(to top, rgba(0, 123, 255, 0.4), rgba(0, 123, 255, 0.8));
+    border-radius: 6px 6px 0 0;
+    border: 1px solid rgba(0, 123, 255, 0.5);
+    border-bottom: none;
+    transition: 0.3s;
+}
+
+.bar:hover {
+    background: linear-gradient(to top, rgba(40, 167, 69, 0.5), rgba(40, 167, 69, 0.9));
+    border-color: rgba(40, 167, 69, 0.6);
+}
+
+.bar-group span {
+    position: absolute;
+    bottom: -25px;
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+/* ===== MOBILE TOPBAR ===== */
+.mobile-topbar {
+    display: none;
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    height: 56px;
+    background: rgba(0, 41, 17, 0.97);
+    backdrop-filter: blur(10px);
+    z-index: 200;
+    align-items: center;
+    padding: 0 1rem;
+    gap: 1rem;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+.mobile-title {
+    color: white;
+    font-weight: 600;
+    font-size: 16px;
+}
+
+.hamburger {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 20px;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 8px;
+    transition: background 0.2s;
+}
+
+.hamburger:hover {
+    background: rgba(255,255,255,0.1);
+}
+
+/* ===== SIDEBAR OVERLAY ===== */
+.sidebar-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 99;
+}
+
+.sidebar-overlay.active {
+    display: block;
+}
+
+/* ── BORROWING CALENDAR ── */
+.cal-section {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 10px;
+    padding: 1rem;
+}
+
+.cal-section-title {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.6);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.75rem;
+}
+
+/* Legend */
+.cal-legend {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 0.75rem;
+}
+
+.cal-legend-item {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.cal-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    display: inline-block;
+    flex-shrink: 0;
+}
+
+.cal-dot.pending  { background: #f59e0b; }
+.cal-dot.approved { background: #22c55e; }
+
+/* Navigation */
+.cal-nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0.5rem;
+}
+
+.cal-nav-btn {
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    color: white;
+    border-radius: 6px;
+    width: 28px;
+    height: 28px;
+    cursor: pointer;
+    font-size: 1.1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.15s;
+}
+
+.cal-nav-btn:hover {
+    background: rgba(255, 255, 255, 0.15);
+}
+
+.cal-month-label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: white;
+}
+
+/* Grid */
+.cal-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 2px;
+}
+
+.cal-day-header {
+    text-align: center;
+    font-size: 0.65rem;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.35);
+    padding: 4px 0;
+    text-transform: uppercase;
+}
+
+.cal-cell {
+    position: relative;
+    text-align: center;
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.7);
+    padding: 5px 2px;
+    border-radius: 5px;
+    cursor: default;
+    transition: background 0.1s;
+    min-height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.cal-cell.empty {
+    background: transparent;
+}
+
+.cal-cell.today {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    font-weight: 700;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* Booked states */
+.cal-cell.cal-pending {
+    background: rgba(245, 158, 11, 0.15);
+    color: #fbbf24;
+}
+
+.cal-cell.cal-approved {
+    background: rgba(34, 197, 94, 0.15);
+    color: #4ade80;
+}
+
+/* Today + booked combination */
+.cal-cell.today.cal-pending {
+    background: rgba(245, 158, 11, 0.25);
+    border-color: #f59e0b;
+}
+
+.cal-cell.today.cal-approved {
+    background: rgba(34, 197, 94, 0.25);
+    border-color: #22c55e;
+}
+
+/* Dot indicator inside cell */
+.cal-indicator {
+    position: absolute;
+    bottom: 2px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+}
+
+.cal-indicator.pending  { background: #f59e0b; }
+.cal-indicator.approved { background: #22c55e; }
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+
+    /* Show mobile topbar */
+    .mobile-topbar {
+        display: flex;
+    }
+
+    /* Sidebar off-screen by default */
+    .sidebar {
+        transform: translateX(-100%);
+        transition: transform 0.3s ease;
+        z-index: 100;
+    }
+
+    /* Sidebar slides in when open */
+    .sidebar.open {
+        transform: translateX(0);
+    }
+
+    /* Main content full width, offset for topbar */
+    .main {
+        margin-left: 0 !important;
+        padding-top: 56px;
+    }
+
+    /* Stack cards vertically */
+    .stats-grid {
+        grid-template-columns: 1fr !important;
+    }
+
+    /* Tables scroll horizontally */
+    .table-container {
+        overflow-x: auto;
+    }
+
+    table {
+        min-width: 600px;
+    }
+
+    /* Full width forms */
+    .search-bar input,
+    .search-bar select {
+        width: 100% !important;
+    }
+
+    /* Modal full width on mobile */
+    #profileModal > div {
+        width: 90% !important;
+        margin: 1rem;
+    }
+
+    /* Main content padding */
+    .main-content {
+        padding: 1rem !important;
+    }
+
+    /* Flash messages */
+    .alert {
+        margin: 0.5rem 1rem 0 !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .mobile-title {
+        font-size: 14px;
+    }
+
+    table {
+        font-size: 13px;
+    }
+
+    .btn, button[type="submit"] {
+        width: 100%;
+        margin-bottom: 0.5rem;
+    }
+}
+
+/* =========================================
+   LIGHT MODE OVERRIDES
+   ========================================= */
+body.light-mode {
+    /* Make sure you save the light background image we generated and update this path! */
+    background: url("../static/img/bg_cover3.png") no-repeat center center/cover;
+    color: #333;
+}
+
+/* Sidebar Light Mode */
+body.light-mode .sidebar {
+    background: rgba(245, 245, 245, 0.85); 
+    border-right: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+body.light-mode .sidebar h2,
+body.light-mode .nav-links a,
+body.light-mode .logout a,
+body.light-mode #theme-toggle {
+    color: #333 !important;
+}
+
+body.light-mode .sidebar-header i {
+    color: rgba(0, 0, 0, 0.7);
+}
+
+body.light-mode .nav-links a:hover, 
+body.light-mode .nav-links a.active {
+    background: rgba(0, 0, 0, 0.05);
+    border-left: 3px solid #007BFF; /* Changing accent to blue for light mode */
+}
+
+/* Cards & Tables Light Mode */
+body.light-mode .stat-card,
+body.light-mode .table-container,
+body.light-mode .search-box input,
+body.light-mode .filter-dropdown {
+    background: rgba(255, 255, 255, 0.85);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    color: #333;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+}
+
+body.light-mode .stat-info p,
+body.light-mode .stat-card i,
+body.light-mode th,
+body.light-mode .search-box input::placeholder,
+body.light-mode td {
+    color: #555;
+}
+
+body.light-mode table td {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+body.light-mode thead th {
+    background: rgba(240, 240, 240, 0.95);
+}
+
+body.light-mode .dashboard-overlay {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+/* =========================================
+   LIGHT MODE OVERRIDES: BAR CHART
+   ========================================= */
+
+/* Update the chart card background and border */
+body.light-mode .chart-container {
+    background: rgba(255, 255, 255, 0.85);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+}
+
+/* Change the chart title to dark gray */
+body.light-mode .chart-container h3 {
+    color: #333;
+}
+
+/* Change the x-axis line at the bottom to dark gray */
+body.light-mode .css-chart {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+}
+
+/* Change the day labels (Mon, Tue, etc.) to dark gray */
+body.light-mode .bar-group span {
+    color: #555;
+    font-weight: bold;
+}
+
+/* Optional: Make the blue bars slightly more solid so they pop better on a light background */
+body.light-mode .bar {
+    background: linear-gradient(to top, rgba(0, 123, 255, 0.6), rgba(0, 123, 255, 1));
+    border: 1px solid rgba(0, 123, 255, 0.8);
+    border-bottom: none;
+}
+
+/* =========================================
+   LIGHT MODE OVERRIDES: EXPORT BUTTON
+   ========================================= */
+body.light-mode .action-btn.export-btn {
+    color: #333; /* Changes text and icon to dark gray/black */
+    background: rgba(0, 0, 0, 0.05); /* Gives it a subtle dark transparent background */
+    border: 1px solid rgba(0, 0, 0, 0.2); /* Darkens the border so it's visible */
+}
+
+body.light-mode .action-btn.export-btn:hover {
+    background: rgba(0, 0, 0, 0.1); /* Darkens slightly when hovered */
+}
+
+/* =========================================
+   LIGHT MODE OVERRIDES: DATE FILTERS
+   ========================================= */
+
+/* Force the "From:" and "To:" text to be dark, overriding the inline HTML style */
+body.light-mode .search-box span {
+    color: #333 !important;
+    font-weight: bold;
+}
+
+/* Ensure the text inside the date input is dark */
+body.light-mode .search-box input[type="date"] {
+    color: #333;
+}
+
+/* Revert the calendar icon back to black so it doesn't disappear */
+body.light-mode input[type="date"]::-webkit-calendar-picker-indicator {
+    filter: invert(0); /* Removes the white filter, making it dark again */
+}
+
+/* =========================================
+   LIGHT MODE OVERRIDES: SEARCH BUTTON
+   ========================================= */
+body.light-mode .controls-container .action-btn[type="submit"] {
+    background: #333 !important; /* Dark gray/black background */
+    color: white !important; /* Keeps the text readable */
+    border-color: #222 !important;
+}
