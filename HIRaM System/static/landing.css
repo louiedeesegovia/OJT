@@ -1,0 +1,175 @@
+/* THIS IS LANDING PAGE CSS */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+}
+
+body {
+    height: 100vh;
+    background: url("../static/img/bg_cover.png") no-repeat center center/cover;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 20px; /* Added padding to prevent elements from touching the screen edges on tiny devices */
+}
+
+/* Title styles */
+.Title {
+    position: relative;
+    z-index: 1;
+    margin-bottom: 30px;
+    text-align: center;
+}
+
+.Title h1 {
+    color: white;
+    font-size: 2rem;
+    text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.7);
+}
+
+/* Logo styles */
+.logo {
+    height: 200px;
+    width: 200px;
+    background: url("../static/img/CSU-logo.png") no-repeat center center/contain;
+    position: relative; 
+    z-index: 1;
+    margin-bottom: 15px;
+}
+
+/* Container styles */
+.container {
+    position: relative;
+    z-index: 1;
+    
+    /* Glassmorphism Styling */
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    
+    /* Original Layout Styling */
+    padding: 40px;
+    border-radius: 12px;
+    text-align: center;
+    
+    /* MOBILE FIX: Use width 100% but cap it at 400px so it scales down on phones */
+    width: 100%;
+    max-width: 400px; 
+    
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+/* Button styles */
+.btn {
+    display: block;
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 15px;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: 0.3s;
+    text-decoration: none; 
+    text-align: center; 
+}
+
+.btn:last-child {
+    margin-bottom: 0;
+}
+
+.student-btn {
+    background-color: #007BFF;
+    color: white;
+}
+
+.student-btn:hover {
+    background-color: #0056b3;
+}
+
+.admin-btn {
+    background-color: #28a745;
+    color: white;
+}
+
+.admin-btn:hover {
+    background-color: #1e7e34;
+}
+
+/* =========================================
+   FORM & LOGIN STYLES 
+   ========================================= */
+
+.input-group {
+    margin-bottom: 20px;
+    width: 100%;
+}
+
+.input-group input {
+    width: 100%;
+    padding: 12px 15px;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    font-size: 16px;
+    outline: none;
+    transition: all 0.3s ease;
+}
+
+.input-group input::placeholder {
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.input-group input:focus {
+    background: rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(40, 167, 69, 0.8);
+    box-shadow: 0 0 10px rgba(40, 167, 69, 0.3);
+}
+
+.link-group {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 20px;
+    width: 100%;
+}
+
+.back-link a, .sign-up a {
+    color: white;
+    text-decoration: none;
+    font-size: 14px;
+    opacity: 0.8;
+    transition: 0.3s;
+}
+
+.back-link a:hover, .sign-up a:hover {
+    opacity: 1;
+    text-decoration: underline;
+}
+
+/* =========================================
+   MOBILE MEDIA QUERIES
+   ========================================= */
+@media (max-width: 480px) {
+    /* Scale down the logo slightly to save vertical space */
+    .logo {
+        height: 140px;
+        width: 140px;
+    }
+
+    /* Shrink the title slightly so it doesn't wrap awkwardly */
+    .Title h1 {
+        font-size: 1.5rem;
+        margin-bottom: 20px;
+    }
+
+    /* Reduce the padding inside the container so buttons have more room */
+    .container {
+        padding: 30px 20px;
+    }
+}
