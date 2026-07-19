@@ -1,0 +1,56 @@
+
+body{
+    margin:0;
+    font-family:Arial;
+    display:flex;
+    background: url("../static/img/bg_cover.png") no-repeat center center/cover;
+}
+
+/* Sidebar */
+
+.sidebar{
+    width:220px;
+    height:100vh;
+    background:#02321d;
+    color:white;
+    padding-top:20px;
+}
+
+.sidebar h2{
+    text-align:center;
+    margin-bottom:30px;
+}
+
+.sidebar a{
+    display:block;
+    padding:12px 20px;
+    color:white;
+    text-decoration:none;
+}
+
+.sidebar a:hover{
+    background:#34495e;
+}
+
+/* Main area */
+
+.main{
+    flex:1;
+    display:flex;
+    flex-direction:column;
+}
+
+/* Topbar */
+
+.topbar{
+    background:#ecf0f1;
+    padding:15px;
+    border-bottom:1px solid #ccc;
+}
+
+/* Page content */
+
+.content{
+    padding:20px;
+}
+
